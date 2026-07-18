@@ -1,36 +1,75 @@
-name: CI/CD Pipeline
+name: Advanced CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "develop" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "develop" ]
+
+env:
+  NODE_VERSION: '22.x'
 
 jobs:
-  build-and-test:
-    name: Build, Lint, and Test
+  analyze-and-lint:
+    name: Lint & Type Check
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Repository
+      - name: Checkout Code
         uses: actions/checkout@v4
-
+      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-
+          
       - name: Install Dependencies
         run: npm ci
-
-      - name: Run Linter
+        
+      - name: TypeScript Compiler Check
+        run: npx tsc --noEmit
+        
+      - name: Run ESLint
         run: npm run lint
 
-      - name: Run Tests
+  test:
+    name: Automated Unit Testing
+    runs-on: ubuntu-latest
+    needs: analyze-and-lint
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install Dependencies
+        run: npm ci
+        
+      - name: Run Vitest Suite (Unit & Component)
         run: npm run test
 
-      - name: Build Application
+  build:
+    name: Production Frontend Build
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install Dependencies
+        run: npm ci
+        
+      - name: Build Next.js Application
         run: npm run build
         env:
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: demo-project
