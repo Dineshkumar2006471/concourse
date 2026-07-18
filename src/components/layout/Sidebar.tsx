@@ -30,7 +30,7 @@ export const Sidebar = React.memo(function Sidebar() {
       </div>
       
       <button
-        className="mb-8 bg-pitch text-on-primary font-body-md text-body-md py-2 px-4 rounded-lg w-full flex items-center justify-center gap-2 hover:bg-pitch-hover transition-colors"
+        className="mb-8 bg-pitch text-on-primary font-body-md text-body-md py-2 px-4 rounded-lg w-full flex items-center justify-center gap-2 hover:bg-pitch-hover transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         aria-label="Create new incident report"
       >
         <span className="material-symbols-outlined text-sm" aria-hidden="true">add</span>
@@ -45,7 +45,7 @@ export const Sidebar = React.memo(function Sidebar() {
               key={item.href}
               href={item.href}
               aria-current={isActive ? 'page' : undefined}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg font-body-md text-body-md transition-colors scale-95 active:scale-90 duration-150 ${
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg font-body-md text-body-md transition-colors scale-95 active:scale-90 duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                 isActive
                   ? 'bg-floodlight-tint text-primary border-r-2 border-secondary'
                   : 'text-on-surface-variant hover:bg-surface-container'
@@ -60,14 +60,14 @@ export const Sidebar = React.memo(function Sidebar() {
 
       <div className="mt-auto space-y-2 border-t border-line pt-4">
         <button
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors scale-95 active:scale-90 duration-150 font-body-md text-body-md"
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors scale-95 active:scale-90 duration-150 font-body-md text-body-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           aria-label="Open settings"
         >
           <span className="material-symbols-outlined" aria-hidden="true">settings</span>
           Settings
         </button>
         <button
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors scale-95 active:scale-90 duration-150 font-body-md text-body-md"
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors scale-95 active:scale-90 duration-150 font-body-md text-body-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           aria-label="Get support"
         >
           <span className="material-symbols-outlined" aria-hidden="true">help</span>

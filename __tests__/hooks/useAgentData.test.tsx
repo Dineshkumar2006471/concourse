@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { useAgentData } from '@/hooks/useAgentData';
 import { vi, describe, it, expect, beforeEach, Mock } from 'vitest';
 import { onSnapshot, doc } from 'firebase/firestore';
@@ -56,18 +56,39 @@ describe('useAgentData Hook', () => {
     expect(result.current.connectionState).toBe('connected');
   });
 
-  it('should set error state when snapshot errors', () => {
+  it('should transition to disconnected state on initial errors before max retries', () => {
+    let callCount = 0;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (onSnapshot as Mock).mockImplementation((...args: any[]) => {
+      callCount++;
+      // Only fail the very first listener to simulate a single temporary drop
+      if (callCount === 1) {
+        const onError = args[2];
+        onError({ code: 'unavailable', message: 'Offline' });
+      }
+      return vi.fn();
+    });
+
+    const { result } = renderHook(() => useAgentData());
+
+    // Should be disconnected, not error, because it hasn't hit maxRetries yet
+    expect(result.current.connectionState).toBe('disconnected');
+    expect(result.current.lastError).toBe('Offline');
+  });
+
+  it('should transition to error state after max retries are exhausted', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (onSnapshot as Mock).mockImplementation((...args: any[]) => {
+      // Fail all 6 listeners immediately, which will blow past maxRetries (5)
       const onError = args[2];
-      onError({ code: 'permission-denied', message: 'Missing permissions' });
+      onError({ code: 'unavailable', message: 'Persistent Failure' });
       return vi.fn();
     });
 
     const { result } = renderHook(() => useAgentData());
 
     expect(result.current.connectionState).toBe('error');
-    expect(result.current.lastError).toBe('Missing permissions');
+    expect(result.current.lastError).toBe('Persistent Failure');
   });
 
   it('should return memoized value (referential stability)', () => {
