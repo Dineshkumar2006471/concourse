@@ -15,7 +15,7 @@ export default function Page() {
 {/*  TopAppBar  */}
 
 {/*  Main Content Canvas  */}
-<main className="flex-1 lg:ml-[240px] p-margin-mobile md:p-margin-desktop max-w-max-width mx-auto w-full">
+<main className="flex-1 lg:ml-[240px] p-margin-mobile md:p-margin-desktop max-w-max-width mx-auto w-full" role="main" aria-label="Transit Logistics">
 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 {/*  Left Column: Map & Departures  */}
 <div className="lg:col-span-8 flex flex-col gap-6">
@@ -32,14 +32,14 @@ export default function Page() {
 <div className="bg-canvas border border-line rounded-xl p-6 shadow-sm">
 <h2 className="font-headline-md text-headline-md mb-6 flex items-center gap-2"><span className="material-symbols-outlined text-primary">schedule</span> Transit Board</h2>
 <div className="overflow-x-auto">
-<table className="w-full text-left border-collapse">
+<table className="w-full text-left border-collapse" aria-label="Transit departure board">
 <thead>
 <tr className="border-b border-line text-ink-muted font-label-caps text-label-caps">
-<th className="py-3 px-4 font-normal">ROUTE</th>
-<th className="py-3 px-4 font-normal">VEHICLE</th>
-<th className="py-3 px-4 font-normal">STATUS</th>
-<th className="py-3 px-4 font-normal">ETA</th>
-<th className="py-3 px-4 font-normal text-right">CAPACITY</th>
+<th scope="col" className="py-3 px-4 font-normal">ROUTE</th>
+<th scope="col" className="py-3 px-4 font-normal">VEHICLE</th>
+<th scope="col" className="py-3 px-4 font-normal">STATUS</th>
+<th scope="col" className="py-3 px-4 font-normal">ETA</th>
+<th scope="col" className="py-3 px-4 font-normal text-right">CAPACITY</th>
 </tr>
 </thead>
 <tbody className="font-data-md text-data-md">

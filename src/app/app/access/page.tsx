@@ -14,7 +14,7 @@ export default function Page() {
 {/*  TopAppBar  */}
 
 {/*  Main Canvas  */}
-<main className="flex-1 lg:ml-[240px] p-margin-mobile md:p-margin-desktop max-w-max-width mx-auto w-full">
+<main className="flex-1 lg:ml-[240px] p-margin-mobile md:p-margin-desktop max-w-max-width mx-auto w-full" role="main" aria-label="Access Secure Operations">
 {/*  Header Section  */}
 <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
 <div>
@@ -46,7 +46,7 @@ export default function Page() {
 </div>
 </div>
 <div className="text-right">
-<span className="font-data-lg text-headline-lg text-primary block">{access.detectedBreaches ?? pulse?.activeIncidents ?? 0}</span>
+<span className="font-data-lg text-headline-lg text-primary block" role="status" aria-live="polite">{access.detectedBreaches ?? pulse?.activeIncidents ?? 0}</span>
 <span className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Detected Breaches</span>
 </div>
 </div>

@@ -10,7 +10,7 @@ export default function Page() {
 {/*  SideNavBar (Permanent)  */}
 
 {/*  Canvas  */}
-<main className="flex-1 lg:ml-[240px] flex overflow-hidden bg-canvas">
+<main className="flex-1 lg:ml-[240px] flex overflow-hidden bg-canvas" role="main" aria-label="Polyglot Translation Interface">
 {/*  Left Panel: Multilingual Chat Interface  */}
 <div className="flex-1 flex flex-col border-r border-line relative">
 {/*  Chat Header  */}
@@ -76,8 +76,8 @@ export default function Page() {
 <div className="p-4 border-t border-line bg-canvas">
 <div className="relative flex items-center">
 <div className="absolute left-3 flex gap-2">
-<button className="text-ink-muted hover:text-primary transition-colors" aria-label="Toggle Microphone"><span className="material-symbols-outlined text-[20px]">mic</span></button>
-<button className="text-ink-muted hover:text-primary transition-colors" aria-label="Toggle Auto-Translate"><span className="material-symbols-outlined text-[20px]">translate</span></button>
+<button className="text-ink-muted hover:text-primary transition-colors" aria-label="Toggle Microphone"><span className="material-symbols-outlined text-[20px]" aria-hidden="true">mic</span></button>
+<button className="text-ink-muted hover:text-primary transition-colors" aria-label="Toggle Auto-Translate"><span className="material-symbols-outlined text-[20px]" aria-hidden="true">translate</span></button>
 </div>
 <input className="w-full pl-16 pr-12 py-3 border border-line rounded-lg bg-canvas-alt font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-all" placeholder="Type message to broadcast (auto-translated to relevant sectors)..." type="text"/>
 <button className="absolute right-3 bg-primary text-on-primary w-8 h-8 rounded flex items-center justify-center hover:bg-pitch-hover transition-colors" aria-label="Send Message">

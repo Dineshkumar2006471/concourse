@@ -11,7 +11,7 @@ export default function Page() {
 {/*  active item: Verde  */}
 
 {/*  Page Content  */}
-<main className="flex-1 lg:ml-[240px] overflow-y-auto bg-canvas-alt p-margin-mobile md:p-margin-desktop h-full w-full max-w-max-width mx-auto">
+<main className="flex-1 lg:ml-[240px] overflow-y-auto bg-canvas-alt p-margin-mobile md:p-margin-desktop h-full w-full max-w-max-width mx-auto" role="main" aria-label="Verde Sustainability Dashboard">
 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
 {/*  Left Column: Dashboard Canvas  */}
 <div className="lg:col-span-8 space-y-6 flex flex-col">

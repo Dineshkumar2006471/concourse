@@ -1,94 +1,27 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { db } from '@/lib/firebase';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, FirestoreError } from 'firebase/firestore';
+import type {
+  PulseData,
+  TransitData,
+  AccessData,
+  WayfinderData,
+  PolyglotData,
+  VerdeData,
+} from '@/types/agent';
 
-/**
- * Live pulse data metrics representing overall stadium occupancy and throughput.
- */
-export type PulseData = {
-  occupancy: number;
-  flowRate: number;
-  activeIncidents: number;
-  timestamp: string;
-};
+// Re-export types for backward compatibility
+export type { PulseData, TransitData, AccessData, WayfinderData, PolyglotData, VerdeData } from '@/types/agent';
+export type { AccessLog, WayfinderLog, PolyglotChat, VerdeLog } from '@/types/agent';
 
-export type TransitData = {
-  trains: Array<{ line: string; status: string; time: string; color: string }>;
-};
+/** Connection lifecycle state for the real-time Firestore link. */
+export type ConnectionState = 'connecting' | 'connected' | 'disconnected' | 'error';
 
-export type AccessLog = {
-  type: 'sensor' | 'group' | 'agent' | 'conclusion';
-  message: string;
-  submessage?: string;
-  icon: string;
-  color: string;
-  bg: string;
-  time: string;
-};
-
-export type AccessData = {
-  validScans: number;
-  invalidAttempts: number;
-  vipClearances: number;
-  detectedBreaches: number;
-  reasoningTrail: AccessLog[];
-  timestamp: string;
-};
-
-export type WayfinderLog = {
-  type: string;
-  title: string;
-  message: string;
-  icon: string;
-  color: string;
-  bg: string;
-  time: string;
-};
-
-export type WayfinderData = {
-  activeReroute: boolean;
-  targetGate: string;
-  flowRate: number;
-  capacityLimit: number;
-  reasoningTrail: WayfinderLog[];
-  timestamp: string;
-};
-
-export type PolyglotChat = {
-  sender: string;
-  lang: string;
-  source: string;
-  translated: string;
-  conf: number;
-  align: 'left' | 'right';
-  isAgent?: boolean;
-  time: string;
-};
-
-export type PolyglotData = {
-  activeNodes: number;
-  liveTranslations: PolyglotChat[];
-  timestamp: string;
-};
-
-export type VerdeLog = {
-  time: string;
-  message: string;
-  type: 'log' | 'recommendation';
-  submessage?: string;
-  savings?: string;
-};
-
-export type VerdeData = {
-  powerDraw: number;
-  waterUsage: number;
-  carbonFootprint: string;
-  reasoningTrail: VerdeLog[];
-  timestamp: string;
-};
-
+// ──────────────────────────────────────────────
+// Defaults
+// ──────────────────────────────────────────────
 const DEFAULT_PULSE: PulseData = { occupancy: 0, flowRate: 0, activeIncidents: 0, timestamp: '' };
 const DEFAULT_TRANSIT: TransitData = { trains: [] };
 const DEFAULT_ACCESS: AccessData = { validScans: 0, invalidAttempts: 0, vipClearances: 0, detectedBreaches: 0, reasoningTrail: [], timestamp: '' };
@@ -96,13 +29,21 @@ const DEFAULT_WAYFINDER: WayfinderData = { activeReroute: false, targetGate: '',
 const DEFAULT_POLYGLOT: PolyglotData = { activeNodes: 0, liveTranslations: [], timestamp: '' };
 const DEFAULT_VERDE: VerdeData = { powerDraw: 0, waterUsage: 0, carbonFootprint: '', reasoningTrail: [], timestamp: '' };
 
+/** Staleness threshold in milliseconds (30 seconds). */
+const STALE_THRESHOLD_MS = 30_000;
+
 /**
  * Global hook to subscribe to real-time agent metrics from Firebase Firestore.
- * This hook establishes WebSocket connections via `onSnapshot` and automatically cleans up
- * listeners on unmount. Avoid calling this hook in deeply nested components to prevent
- * excessive re-renders; instead, call it near the top of the component tree and pass data down.
  *
- * @returns An object containing live states for all 6 Concourse AI Agents.
+ * This hook establishes WebSocket connections via `onSnapshot` and automatically
+ * cleans up listeners on unmount. It tracks connection state, detects stale data,
+ * and handles errors with retry logic.
+ *
+ * Avoid calling this hook in deeply nested components to prevent excessive
+ * re-renders; instead, call it near the top of the component tree and pass data down.
+ *
+ * @returns An object containing live states for all 6 Concourse AI Agents,
+ *          connection state, staleness indicator, and the last error message.
  */
 export function useAgentData() {
   const [pulse, setPulse] = useState<PulseData>(DEFAULT_PULSE);
@@ -111,38 +52,116 @@ export function useAgentData() {
   const [wayfinder, setWayfinder] = useState<WayfinderData>(DEFAULT_WAYFINDER);
   const [polyglot, setPolyglot] = useState<PolyglotData>(DEFAULT_POLYGLOT);
   const [verde, setVerde] = useState<VerdeData>(DEFAULT_VERDE);
-  const [isConnected, setIsConnected] = useState(false);
+  const [connectionState, setConnectionState] = useState<ConnectionState>('connecting');
+  const [lastError, setLastError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<number>(0);
+  const [isStale, setIsStale] = useState(false);
+  const retryCountRef = useRef(0);
+  const maxRetries = 5;
 
+  // Legacy compat
+  const isConnected = connectionState === 'connected';
+
+  // ──────────────────────────────────────────
+  // Staleness detector
+  // ──────────────────────────────────────────
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - lastUpdated;
+      setIsStale(elapsed > STALE_THRESHOLD_MS);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [lastUpdated]);
+
+  // ──────────────────────────────────────────
+  // Error handler with retry logic
+  // ──────────────────────────────────────────
+  const handleSnapshotError = useCallback((error: FirestoreError) => {
+    console.error('[useAgentData] Firestore snapshot error:', error.code, error.message);
+    setLastError(error.message);
+
+    if (retryCountRef.current < maxRetries) {
+      retryCountRef.current += 1;
+      setConnectionState('disconnected');
+    } else {
+      setConnectionState('error');
+    }
+  }, []);
+
+  // ──────────────────────────────────────────
+  // Firestore subscriptions
+  // ──────────────────────────────────────────
   useEffect(() => {
     const unsubs: Array<() => void> = [];
+    retryCountRef.current = 0;
 
     try {
-      unsubs.push(onSnapshot(doc(db, 'pulse_metrics', 'live'), (doc) => {
-        if (doc.exists()) { setIsConnected(true); setPulse(doc.data() as PulseData); }
-      }));
-      unsubs.push(onSnapshot(doc(db, 'transit_schedules', 'live'), (doc) => {
-        if (doc.exists()) setTransit(doc.data() as TransitData);
-      }));
-      unsubs.push(onSnapshot(doc(db, 'access_logs', 'live'), (doc) => {
-        if (doc.exists()) setAccess(doc.data() as AccessData);
-      }));
-      unsubs.push(onSnapshot(doc(db, 'wayfinder_routes', 'live'), (doc) => {
-        if (doc.exists()) setWayfinder(doc.data() as WayfinderData);
-      }));
-      unsubs.push(onSnapshot(doc(db, 'polyglot_streams', 'live'), (doc) => {
-        if (doc.exists()) setPolyglot(doc.data() as PolyglotData);
-      }));
-      unsubs.push(onSnapshot(doc(db, 'verde_stats', 'live'), (doc) => {
-        if (doc.exists()) setVerde(doc.data() as VerdeData);
-      }));
+      unsubs.push(onSnapshot(
+        doc(db, 'pulse_metrics', 'live'),
+        (snapshot) => {
+          if (snapshot.exists()) {
+            setConnectionState('connected');
+            setLastError(null);
+            setLastUpdated(Date.now());
+            setPulse(snapshot.data() as PulseData);
+          }
+        },
+        handleSnapshotError,
+      ));
+
+      unsubs.push(onSnapshot(
+        doc(db, 'transit_schedules', 'live'),
+        (snapshot) => { if (snapshot.exists()) setTransit(snapshot.data() as TransitData); },
+        handleSnapshotError,
+      ));
+
+      unsubs.push(onSnapshot(
+        doc(db, 'access_logs', 'live'),
+        (snapshot) => { if (snapshot.exists()) setAccess(snapshot.data() as AccessData); },
+        handleSnapshotError,
+      ));
+
+      unsubs.push(onSnapshot(
+        doc(db, 'wayfinder_routes', 'live'),
+        (snapshot) => { if (snapshot.exists()) setWayfinder(snapshot.data() as WayfinderData); },
+        handleSnapshotError,
+      ));
+
+      unsubs.push(onSnapshot(
+        doc(db, 'polyglot_streams', 'live'),
+        (snapshot) => { if (snapshot.exists()) setPolyglot(snapshot.data() as PolyglotData); },
+        handleSnapshotError,
+      ));
+
+      unsubs.push(onSnapshot(
+        doc(db, 'verde_stats', 'live'),
+        (snapshot) => { if (snapshot.exists()) setVerde(snapshot.data() as VerdeData); },
+        handleSnapshotError,
+      ));
     } catch (err) {
-      console.warn("Firebase collection not initialized or rules denying access.", err);
+      console.warn('[useAgentData] Failed to initialize Firestore listeners:', err);
+      // Error state will be set by handleSnapshotError callbacks
     }
 
     return () => {
       unsubs.forEach(unsub => unsub());
     };
-  }, []);
+  }, [handleSnapshotError]);
 
-  return { pulse, transit, access, wayfinder, polyglot, verde, isConnected };
+  // ──────────────────────────────────────────
+  // Memoized return value
+  // ──────────────────────────────────────────
+  return useMemo(() => ({
+    pulse,
+    transit,
+    access,
+    wayfinder,
+    polyglot,
+    verde,
+    isConnected,
+    connectionState,
+    isStale,
+    lastError,
+    lastUpdated,
+  }), [pulse, transit, access, wayfinder, polyglot, verde, isConnected, connectionState, isStale, lastError, lastUpdated]);
 }

@@ -12,9 +12,9 @@ export default function Page() {
 
 
 {/*  Main Content  */}
-<main className="lg:ml-[240px] p-margin-mobile md:p-margin-desktop max-w-max-width mx-auto space-y-8 pb-24">
+<main className="lg:ml-[240px] p-margin-mobile md:p-margin-desktop max-w-max-width mx-auto space-y-8 pb-24" role="main" aria-label="Command Center Dashboard">
 {/*  Context Card  */}
-<section className="bg-canvas-alt border border-line rounded-xl p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative overflow-hidden">
+<section className="bg-canvas-alt border border-line rounded-xl p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative overflow-hidden" aria-label="Match context">
 <div className="absolute top-0 right-0 w-64 h-full opacity-10 pointer-events-none" data-alt="Abstract blueprint of a massive sports stadium structure, technical drawing style, dark blue ink lines on white background, highly detailed." style={{ backgroundImage: "url('/images/stadium_aerial_real.png')", backgroundSize: 'cover' }}></div>
 <div className="z-10">
 <h2 className="font-headline-lg text-headline-lg text-on-surface mb-2">Good afternoon, Command.</h2>
@@ -44,7 +44,7 @@ export default function Page() {
 <span className="material-symbols-outlined text-primary">memory</span>
                     Active AI Agents
                 </h3>
-<span className={`font-label-caps text-label-caps ${pulse?.activeIncidents > 0 ? 'text-signal animate-pulse' : 'text-ink-muted'}`}>
+<span className={`font-label-caps text-label-caps ${pulse?.activeIncidents > 0 ? 'text-signal animate-pulse' : 'text-ink-muted'}`} role="status" aria-live="assertive">
                     {pulse?.activeIncidents > 0 ? 'SYSTEM ALERT' : 'System Nominal'}
                 </span>
 </div>
@@ -75,8 +75,8 @@ export default function Page() {
 <span className="block font-label-caps text-[10px] text-ink-muted mb-1">LIVE REROUTES</span>
 <span className="font-data-md text-data-lg text-on-surface font-semibold">{wayfinder.activeReroute ? '1 Active' : '0 Active'}</span>
 </div>
-<Link href="/app/wayfinder">
-<button className="material-symbols-outlined text-ink-muted hover:text-primary transition-colors">arrow_forward</button>
+<Link href="/app/wayfinder" aria-label="Open Wayfinder agent">
+<span className="material-symbols-outlined text-ink-muted hover:text-primary transition-colors" role="img" aria-hidden="true">arrow_forward</span>
 </Link>
 </div>
 </div>
@@ -101,8 +101,8 @@ export default function Page() {
 <span className="block font-label-caps text-[10px] text-ink-muted mb-1">CONCOURSE C</span>
 <span className="font-data-md text-data-lg text-signal font-semibold">{pulse?.occupancy ?? 92}% Occupancy</span>
 </div>
-<Link href="/app/pulse">
-<button className="material-symbols-outlined text-floodlight hover:text-secondary transition-colors">arrow_forward</button>
+<Link href="/app/pulse" aria-label="Open Pulse agent">
+<span className="material-symbols-outlined text-floodlight hover:text-secondary transition-colors" role="img" aria-hidden="true">arrow_forward</span>
 </Link>
 </div>
 </div>
@@ -126,8 +126,8 @@ export default function Page() {
 <span className="block font-label-caps text-[10px] text-ink-muted mb-1">INBOUND FLEET</span>
 <span className="font-data-md text-data-lg text-on-surface font-semibold">{transit?.trains?.length ?? 45} Vehicles</span>
 </div>
-<Link href="/app/transit">
-<button className="material-symbols-outlined text-ink-muted hover:text-primary transition-colors">arrow_forward</button>
+<Link href="/app/transit" aria-label="Open Transit agent">
+<span className="material-symbols-outlined text-ink-muted hover:text-primary transition-colors" role="img" aria-hidden="true">arrow_forward</span>
 </Link>
 </div>
 </div>
@@ -151,8 +151,8 @@ export default function Page() {
 <span className="block font-label-caps text-[10px] text-ink-muted mb-1">GRID DRAW</span>
 <span className="font-data-md text-data-lg text-on-surface font-semibold">{verde.powerDraw ? verde.powerDraw.toFixed(1) : 4.2} MW</span>
 </div>
-<Link href="/app/verde">
-<button className="material-symbols-outlined text-ink-muted hover:text-primary transition-colors">arrow_forward</button>
+<Link href="/app/verde" aria-label="Open Verde agent">
+<span className="material-symbols-outlined text-ink-muted hover:text-primary transition-colors" role="img" aria-hidden="true">arrow_forward</span>
 </Link>
 </div>
 </div>
@@ -177,8 +177,8 @@ export default function Page() {
 <span className="block font-label-caps text-[10px] text-ink-muted mb-1">ACTIVE SESSIONS</span>
 <span className="font-data-md text-data-lg text-on-surface font-semibold">{polyglot.activeNodes || 124} Nodes</span>
 </div>
-<Link href="/app/polyglot">
-<button className="material-symbols-outlined text-ink-muted hover:text-primary transition-colors">arrow_forward</button>
+<Link href="/app/polyglot" aria-label="Open Polyglot agent">
+<span className="material-symbols-outlined text-ink-muted hover:text-primary transition-colors" role="img" aria-hidden="true">arrow_forward</span>
 </Link>
 </div>
 </div>
@@ -202,8 +202,8 @@ export default function Page() {
 <span className="block font-label-caps text-[10px] text-ink-muted mb-1">ZONE BREACHES</span>
 <span className="font-data-md text-data-lg text-on-surface font-semibold">{access.detectedBreaches || 0} Detected</span>
 </div>
-<Link href="/app/access">
-<button className="material-symbols-outlined text-ink-muted hover:text-primary transition-colors">arrow_forward</button>
+<Link href="/app/access" aria-label="Open Access agent">
+<span className="material-symbols-outlined text-ink-muted hover:text-primary transition-colors" role="img" aria-hidden="true">arrow_forward</span>
 </Link>
 </div>
 </div>

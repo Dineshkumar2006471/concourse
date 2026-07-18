@@ -10,7 +10,7 @@ export default function Page() {
 
 
 
-<main className="flex-1 lg:ml-[240px] p-margin-desktop bg-surface flex flex-col gap-6 w-full max-w-max-width mx-auto">
+<main className="flex-1 lg:ml-[240px] p-margin-desktop bg-surface flex flex-col gap-6 w-full max-w-max-width mx-auto" role="main" aria-label="Wayfinder Smart Routing">
 <div className="flex justify-between items-end">
 <div>
 <h2 className="font-headline-lg text-headline-lg text-on-surface tracking-tight">Wayfinder — Smart Routing</h2>
@@ -56,9 +56,9 @@ export default function Page() {
 </g>
 </svg>
 <div className="absolute bottom-4 right-4 flex flex-col gap-2">
-<button className="w-10 h-10 rounded bg-canvas border border-line shadow-sm flex items-center justify-center text-on-surface hover:bg-surface-container"><span className="material-symbols-outlined">add</span></button>
-<button className="w-10 h-10 rounded bg-canvas border border-line shadow-sm flex items-center justify-center text-on-surface hover:bg-surface-container"><span className="material-symbols-outlined">remove</span></button>
-<button className="w-10 h-10 rounded bg-canvas border border-line shadow-sm flex items-center justify-center text-on-surface hover:bg-surface-container mt-2"><span className="material-symbols-outlined">my_location</span></button>
+<button className="w-10 h-10 rounded bg-canvas border border-line shadow-sm flex items-center justify-center text-on-surface hover:bg-surface-container" aria-label="Zoom in"><span className="material-symbols-outlined" aria-hidden="true">add</span></button>
+<button className="w-10 h-10 rounded bg-canvas border border-line shadow-sm flex items-center justify-center text-on-surface hover:bg-surface-container" aria-label="Zoom out"><span className="material-symbols-outlined" aria-hidden="true">remove</span></button>
+<button className="w-10 h-10 rounded bg-canvas border border-line shadow-sm flex items-center justify-center text-on-surface hover:bg-surface-container mt-2" aria-label="Center on my location"><span className="material-symbols-outlined" aria-hidden="true">my_location</span></button>
 </div>
 </div>
 </div>

@@ -11,7 +11,7 @@ export default function Page() {
 {/*  SideNavBar  */}
 
 {/*  Map & Dashboard Area  */}
-<main className="flex-1 lg:ml-[240px] bg-background p-6 flex flex-col relative overflow-y-auto">
+<main className="flex-1 lg:ml-[240px] bg-background p-6 flex flex-col relative overflow-y-auto" role="main" aria-label="Pulse Diagnostics">
 {/*  Data Chips Header  */}
 <div className="flex gap-4 mb-6">
 <div className="bg-canvas border border-line rounded-[16px] p-4 flex-1 flex flex-col">
@@ -32,7 +32,7 @@ export default function Page() {
 <div className="absolute inset-0 bg-error-container opacity-20 pulse-ring"></div>
 <span className="font-label-caps text-label-caps text-error z-10 relative">HOTSPOTS</span>
 <div className="flex items-baseline gap-2 mt-1 z-10 relative">
-<span className="font-data-lg text-headline-lg text-error">{pulse?.activeIncidents ?? 3}</span>
+<span className="font-data-lg text-headline-lg text-error" role="status" aria-live="polite">{pulse?.activeIncidents ?? 3}</span>
 <span className="font-body-sm text-body-sm text-ink-muted">Active Alerts</span>
 </div>
 </div>

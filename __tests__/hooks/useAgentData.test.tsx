@@ -18,29 +18,30 @@ describe('useAgentData Hook', () => {
     vi.clearAllMocks();
   });
 
-  it('should initialize with default states', () => {
-    (onSnapshot as Mock).mockImplementation((_doc, _callback) => {
-      // do nothing to simulate no data
-      return vi.fn(); 
+  it('should initialize with default states and connecting status', () => {
+    (onSnapshot as Mock).mockImplementation((_docRef, _onNext, _onError) => {
+      return vi.fn(); // unsubscribe mock
     });
 
     const { result } = renderHook(() => useAgentData());
 
-    expect(result.current.isConnected).toBe(false);
     expect(result.current.pulse.occupancy).toBe(0);
     expect(result.current.access.validScans).toBe(0);
     expect(result.current.wayfinder.activeReroute).toBe(false);
     expect(result.current.polyglot.activeNodes).toBe(0);
     expect(result.current.verde.powerDraw).toBe(0);
     expect(result.current.transit.trains).toEqual([]);
+    expect(result.current.connectionState).toBe('connecting');
+    expect(result.current.isStale).toBe(false);
+    expect(result.current.lastError).toBeNull();
   });
 
-  it('should update state when onSnapshot triggers', () => {
-    (onSnapshot as Mock).mockImplementation((ref, callback) => {
+  it('should set connected state when snapshot fires', () => {
+    (onSnapshot as Mock).mockImplementation((ref, onNext, _onError) => {
       if (ref === 'pulse_doc_mock') {
-        callback({ exists: () => true, data: () => ({ occupancy: 85, flowRate: 120, activeIncidents: 0, timestamp: '12:00:00 UTC' }) });
+        onNext({ exists: () => true, data: () => ({ occupancy: 85, flowRate: 120, activeIncidents: 0, timestamp: '12:00:00 UTC' }) });
       }
-      return vi.fn(); 
+      return vi.fn();
     });
 
     (doc as Mock).mockImplementation((_db, collection, _id) => {
@@ -52,5 +53,30 @@ describe('useAgentData Hook', () => {
 
     expect(result.current.pulse.occupancy).toBe(85);
     expect(result.current.isConnected).toBe(true);
+    expect(result.current.connectionState).toBe('connected');
+  });
+
+  it('should set error state when snapshot errors', () => {
+    (onSnapshot as Mock).mockImplementation((_ref, _onNext, onError) => {
+      onError({ code: 'permission-denied', message: 'Missing permissions' });
+      return vi.fn();
+    });
+
+    const { result } = renderHook(() => useAgentData());
+
+    expect(result.current.connectionState).toBe('error');
+    expect(result.current.lastError).toBe('Missing permissions');
+  });
+
+  it('should return memoized value (referential stability)', () => {
+    (onSnapshot as Mock).mockImplementation((_docRef, _onNext, _onError) => vi.fn());
+
+    const { result, rerender } = renderHook(() => useAgentData());
+    const firstRender = result.current;
+    rerender();
+    const secondRender = result.current;
+
+    // Same reference means useMemo is working
+    expect(firstRender).toBe(secondRender);
   });
 });
