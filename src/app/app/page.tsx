@@ -75,8 +75,8 @@ export default function Page() {
 <span className="block font-label-caps text-[10px] text-ink-muted mb-1">LIVE REROUTES</span>
 <span className="font-data-md text-data-lg text-on-surface font-semibold">{wayfinder.activeReroute ? '1 Active' : '0 Active'}</span>
 </div>
-<Link href="/app/wayfinder" aria-label="Open Wayfinder agent">
-<span className="material-symbols-outlined text-ink-muted hover:text-primary transition-colors" role="img" aria-hidden="true">arrow_forward</span>
+<Link href="/app/wayfinder" aria-label="Open Wayfinder agent" className="after:absolute after:inset-0">
+<span className="material-symbols-outlined text-ink-muted group-hover:text-primary transition-colors" role="img" aria-hidden="true">arrow_forward</span>
 </Link>
 </div>
 </div>
@@ -101,8 +101,8 @@ export default function Page() {
 <span className="block font-label-caps text-[10px] text-ink-muted mb-1">CONCOURSE C</span>
 <span className="font-data-md text-data-lg text-signal font-semibold">{pulse?.occupancy ?? 92}% Occupancy</span>
 </div>
-<Link href="/app/pulse" aria-label="Open Pulse agent">
-<span className="material-symbols-outlined text-floodlight hover:text-secondary transition-colors" role="img" aria-hidden="true">arrow_forward</span>
+<Link href="/app/pulse" aria-label="Open Pulse agent" className="after:absolute after:inset-0">
+<span className="material-symbols-outlined text-floodlight group-hover:text-secondary transition-colors" role="img" aria-hidden="true">arrow_forward</span>
 </Link>
 </div>
 </div>
@@ -126,8 +126,8 @@ export default function Page() {
 <span className="block font-label-caps text-[10px] text-ink-muted mb-1">INBOUND FLEET</span>
 <span className="font-data-md text-data-lg text-on-surface font-semibold">{transit?.trains?.length ?? 45} Vehicles</span>
 </div>
-<Link href="/app/transit" aria-label="Open Transit agent">
-<span className="material-symbols-outlined text-ink-muted hover:text-primary transition-colors" role="img" aria-hidden="true">arrow_forward</span>
+<Link href="/app/transit" aria-label="Open Transit agent" className="after:absolute after:inset-0">
+<span className="material-symbols-outlined text-ink-muted group-hover:text-primary transition-colors" role="img" aria-hidden="true">arrow_forward</span>
 </Link>
 </div>
 </div>
@@ -151,8 +151,8 @@ export default function Page() {
 <span className="block font-label-caps text-[10px] text-ink-muted mb-1">GRID DRAW</span>
 <span className="font-data-md text-data-lg text-on-surface font-semibold">{verde.powerDraw ? verde.powerDraw.toFixed(1) : 4.2} MW</span>
 </div>
-<Link href="/app/verde" aria-label="Open Verde agent">
-<span className="material-symbols-outlined text-ink-muted hover:text-primary transition-colors" role="img" aria-hidden="true">arrow_forward</span>
+<Link href="/app/verde" aria-label="Open Verde agent" className="after:absolute after:inset-0">
+<span className="material-symbols-outlined text-ink-muted group-hover:text-primary transition-colors" role="img" aria-hidden="true">arrow_forward</span>
 </Link>
 </div>
 </div>
@@ -177,8 +177,8 @@ export default function Page() {
 <span className="block font-label-caps text-[10px] text-ink-muted mb-1">ACTIVE SESSIONS</span>
 <span className="font-data-md text-data-lg text-on-surface font-semibold">{polyglot.activeNodes || 124} Nodes</span>
 </div>
-<Link href="/app/polyglot" aria-label="Open Polyglot agent">
-<span className="material-symbols-outlined text-ink-muted hover:text-primary transition-colors" role="img" aria-hidden="true">arrow_forward</span>
+<Link href="/app/polyglot" aria-label="Open Polyglot agent" className="after:absolute after:inset-0">
+<span className="material-symbols-outlined text-ink-muted group-hover:text-primary transition-colors" role="img" aria-hidden="true">arrow_forward</span>
 </Link>
 </div>
 </div>
@@ -202,8 +202,8 @@ export default function Page() {
 <span className="block font-label-caps text-[10px] text-ink-muted mb-1">ZONE BREACHES</span>
 <span className="font-data-md text-data-lg text-on-surface font-semibold">{access.detectedBreaches || 0} Detected</span>
 </div>
-<Link href="/app/access" aria-label="Open Access agent">
-<span className="material-symbols-outlined text-ink-muted hover:text-primary transition-colors" role="img" aria-hidden="true">arrow_forward</span>
+<Link href="/app/access" aria-label="Open Access agent" className="after:absolute after:inset-0">
+<span className="material-symbols-outlined text-ink-muted group-hover:text-primary transition-colors" role="img" aria-hidden="true">arrow_forward</span>
 </Link>
 </div>
 </div>
