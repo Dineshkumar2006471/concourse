@@ -35,35 +35,51 @@ Concourse doesn't just give commands; it shows its work. Every agent response in
 
 ```mermaid
 graph TD
-    subgraph Data & Simulation
-        SIM[Live Simulation Engine Worker] -->|Writes every 5s| DB[(Firebase Firestore)]
-        DB -->|Realtime Subscriptions| HOOK[useAgentData Hook]
-    end
+    SIM[Live Simulation Engine Worker] -->|Writes every 5s| DB[(Firebase Firestore)]
+    DB -->|Realtime Subscriptions| HOOK[useAgentData Hook]
 
-    subgraph The Agent Mesh
-        HOOK --> W[Wayfinder Agent]
-        HOOK --> P[Pulse Agent]
-        HOOK --> T[Transit Agent]
-        HOOK --> V[Verde Agent]
-        HOOK --> PL[Polyglot Agent]
-        HOOK --> A[Access Agent]
-    end
+    HOOK --> W[Wayfinder Agent]
+    HOOK --> P[Pulse Agent]
+    HOOK --> T[Transit Agent]
+    HOOK --> V[Verde Agent]
+    HOOK --> PL[Polyglot Agent]
+    HOOK --> A[Access Agent]
 
-    subgraph Client UI Next.js
-        W --> UI1[Wayfinder Map & Reroutes]
-        P --> UI2[Dashboard System Alerts]
-        T --> UI3[Transit Boards & Delays]
-        V --> UI4[HVAC & Grid Load Opt.]
-        PL --> UI5[Live Comms Translation]
-        A --> UI6[Zone Control & Breaches]
+    W --> UI1[Wayfinder Map]
+    P --> UI2[Dashboard Alerts]
+    T --> UI3[Transit Boards]
+    V --> UI4[HVAC & Grid]
+    PL --> UI5[Live Comms]
+    A --> UI6[Zone Control]
         
-        W & P & T & V & PL & A --> CT[Command Dashboard /app]
-    end
+    UI1 --> CT[Command Dashboard]
+    UI2 --> CT
+    UI3 --> CT
+    UI4 --> CT
+    UI5 --> CT
+    UI6 --> CT
 ```
 
 ---
 
-## 4. Project Structure Diagram
+## 4. Tech Stack & Implementation Details
+
+Concourse is built on a modern, real-time technology stack designed to handle live data streams with zero polling:
+
+- **Frontend Framework: Next.js 14+ (App Router) & React** 
+  Provides a fast, responsive user interface with file-based routing. The entire command dashboard and the individual agent screens are built as separate React routes for clean separation of concerns.
+- **Styling: Tailwind CSS**
+  Used for atomic, utility-first styling. We designed a custom, high-contrast dark mode aesthetic tailored specifically for a stadium command center, entirely driven by Tailwind utility classes.
+- **Real-Time Data Plane: Firebase Firestore**
+  Serves as the central nervous system. Rather than polling an API, the frontend maintains active WebSocket connections to Firestore via the `useAgentData` React hook. As soon as a document is updated in the database, the UI updates instantly.
+- **Simulation Engine: Node.js & TypeScript Worker**
+  Since live IoT sensor data for stadiums isn't public, we built an honest, provably real-time simulation engine (`scripts/simulation-worker.ts`). This worker runs a loop every 5 seconds, computing realistic queueing math, generating synthetic alerts, and writing them directly into Firestore.
+- **AI Orchestration: Gemini 2.5 Flash & Pro (Conceptual)**
+  The logic and data generation is modeled after Genkit and Gemini's capabilities. Instead of a standard chatbot, the AI produces structured "Reasoning Trails", breaking down *why* a decision was made (e.g., detecting a crowd spike, cross-referencing with transit delays, and issuing a reroute).
+
+---
+
+## 5. Project Structure Diagram
 
 ```text
 concourse/
@@ -94,7 +110,7 @@ concourse/
 
 ---
 
-## 5. UI Flow and Workflow Explanation
+## 6. UI Flow and Workflow Explanation
 
 1. **Landing Page:** The user is greeted by a high-conversion, dynamic landing page explaining the Concourse platform, featuring the 6 agent modules and a live-simulated marquee.
 2. **Command Dashboard (`/app`):** The central nervous system. The user views the high-level health of the stadium. If the Pulse agent detects a spike in occupancy, the dashboard instantly flags a "SYSTEM ALERT".
@@ -103,7 +119,7 @@ concourse/
 
 ---
 
-## 6. How to Setup the Environment
+## 7. How to Setup the Environment
 
 ### Prerequisites
 - Node.js (v18+)
@@ -145,6 +161,6 @@ concourse/
 
 ---
 
-## 7. License
+## 8. License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
