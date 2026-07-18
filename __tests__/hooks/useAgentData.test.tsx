@@ -19,7 +19,7 @@ describe('useAgentData Hook', () => {
   });
 
   it('should initialize with default states and connecting status', () => {
-    (onSnapshot as Mock).mockImplementation((_docRef, _onNext, _onError) => {
+    (onSnapshot as Mock).mockImplementation(() => {
       return vi.fn(); // unsubscribe mock
     });
 
@@ -37,14 +37,14 @@ describe('useAgentData Hook', () => {
   });
 
   it('should set connected state when snapshot fires', () => {
-    (onSnapshot as Mock).mockImplementation((ref, onNext, _onError) => {
+    (onSnapshot as Mock).mockImplementation((ref, onNext) => {
       if (ref === 'pulse_doc_mock') {
         onNext({ exists: () => true, data: () => ({ occupancy: 85, flowRate: 120, activeIncidents: 0, timestamp: '12:00:00 UTC' }) });
       }
       return vi.fn();
     });
 
-    (doc as Mock).mockImplementation((_db, collection, _id) => {
+    (doc as Mock).mockImplementation((_db, collection) => {
       if (collection === 'pulse_metrics') return 'pulse_doc_mock';
       return `${collection}_doc_mock`;
     });
@@ -57,7 +57,9 @@ describe('useAgentData Hook', () => {
   });
 
   it('should set error state when snapshot errors', () => {
-    (onSnapshot as Mock).mockImplementation((_ref, _onNext, onError) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (onSnapshot as Mock).mockImplementation((...args: any[]) => {
+      const onError = args[2];
       onError({ code: 'permission-denied', message: 'Missing permissions' });
       return vi.fn();
     });
@@ -69,7 +71,7 @@ describe('useAgentData Hook', () => {
   });
 
   it('should return memoized value (referential stability)', () => {
-    (onSnapshot as Mock).mockImplementation((_docRef, _onNext, _onError) => vi.fn());
+    (onSnapshot as Mock).mockImplementation(() => vi.fn());
 
     const { result, rerender } = renderHook(() => useAgentData());
     const firstRender = result.current;

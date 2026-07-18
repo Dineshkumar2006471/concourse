@@ -20,7 +20,7 @@ vi.mock('@/lib/firebase', () => ({
 describe('Dashboard (Overview) Page', () => {
   it('renders without crashing', () => {
     render(<DashboardPage />);
-    expect(screen.getByText('Concourse')).toBeDefined();
+    expect(screen.getByText('Good afternoon, Command.')).toBeDefined();
   });
 
   it('renders all 6 agent cards', () => {
