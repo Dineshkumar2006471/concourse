@@ -11,7 +11,7 @@ describe('Sidebar Component', () => {
     render(<Sidebar />);
     
     // Check for main nav items
-    expect(screen.getByText('Command Center')).toBeInTheDocument();
+    expect(screen.getByText('Home')).toBeInTheDocument();
     expect(screen.getByText('Pulse')).toBeInTheDocument();
     expect(screen.getByText('Wayfinder')).toBeInTheDocument();
     expect(screen.getByText('Transit')).toBeInTheDocument();
