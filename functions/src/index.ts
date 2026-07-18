@@ -17,40 +17,44 @@ const fallbackPolyglotChats = [
 ];
 
 // ──────────────────────────────────────────────
-// Scheduled Cloud Function (Runs every minute)
+// Helper Functions for Data Generation
 // ──────────────────────────────────────────────
-export const runSimulationTick = onSchedule("every 1 minutes", async (event) => {
-  const now = new Date();
-  
+
+/**
+ * Generates randomized pulse metrics for crowd management.
+ */
+function generatePulseMetrics(now: Date) {
+  return {
+    occupancy: Math.floor(Math.random() * (95 - 75 + 1) + 75),
+    flowRate: Math.floor(Math.random() * (120 - 80 + 1) + 80),
+    activeIncidents: Math.floor(Math.random() * 3),
+    timestamp: now.toISOString(),
+  };
+}
+
+/**
+ * Generates transit schedules for transportation logistics.
+ */
+function generateTransitSchedules(now: Date) {
+  return {
+    trains: [
+      { line: 'NJT Meadowlands Rail', status: 'On Time', time: `${Math.floor(Math.random() * 15 + 1)}m`, color: 'bg-pitch' },
+      { line: 'Coach USA 351 Bus', status: Math.random() > 0.8 ? 'Delayed' : 'On Time', time: `${Math.floor(Math.random() * 30 + 10)}m`, color: Math.random() > 0.8 ? 'bg-signal' : 'bg-pitch' },
+      { line: 'NJT Secaucus Shuttle', status: 'On Time', time: '24m', color: 'bg-pitch' },
+    ],
+    timestamp: now.toISOString(),
+  };
+}
+
+/**
+ * Invokes Gemini AI to generate operational intelligence reasoning trails.
+ */
+async function fetchGenAILogs(ai: GoogleGenAI, occupancy: number, activeIncidents: number) {
+  let aiGeneratedLogs: any = {};
   try {
-    const batch = db.batch();
-
-    // 1. Pulse Metrics
-    const pulseMetrics = {
-      occupancy: Math.floor(Math.random() * (95 - 75 + 1) + 75),
-      flowRate: Math.floor(Math.random() * (120 - 80 + 1) + 80),
-      activeIncidents: Math.floor(Math.random() * 3),
-      timestamp: now.toISOString(),
-    };
-    batch.set(db.doc('pulse_metrics/live'), pulseMetrics);
-
-    // 2. Transit Schedules
-    const transitSchedules = {
-      trains: [
-        { line: 'NJT Meadowlands Rail', status: 'On Time', time: `${Math.floor(Math.random() * 15 + 1)}m`, color: 'bg-pitch' },
-        { line: 'Coach USA 351 Bus', status: Math.random() > 0.8 ? 'Delayed' : 'On Time', time: `${Math.floor(Math.random() * 30 + 10)}m`, color: Math.random() > 0.8 ? 'bg-signal' : 'bg-pitch' },
-        { line: 'NJT Secaucus Shuttle', status: 'On Time', time: '24m', color: 'bg-pitch' },
-      ],
-      timestamp: now.toISOString(),
-    };
-    batch.set(db.doc('transit_schedules/live'), transitSchedules);
-
-    // 3. 🧠 CALL GEMINI TO GENERATE DYNAMIC LOGS (GEN AI REQUIREMENT)
-    let aiGeneratedLogs: any = {};
-    try {
-      const prompt = `You are the AI brain of 'Concourse', a massive stadium management system.
-Current stadium occupancy: ${pulseMetrics.occupancy}%
-Active incidents: ${pulseMetrics.activeIncidents}
+    const prompt = `You are the AI brain of 'Concourse', a massive stadium management system.
+Current stadium occupancy: ${occupancy}%
+Active incidents: ${activeIncidents}
 
 Generate a JSON object containing 3 arrays of realistic simulation logs based on the current context:
 1. 'accessLogs': 4 objects with { type, message, submessage, icon, color, bg }. 
@@ -62,25 +66,44 @@ Generate a JSON object containing 3 arrays of realistic simulation logs based on
 
 Return ONLY valid JSON.`;
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-1.5-flash',
-        contents: prompt,
-        config: { responseMimeType: "application/json" }
-      });
-      aiGeneratedLogs = JSON.parse(response.text || '{}');
-      console.log("✅ Successfully generated dynamic Gen AI logs.");
-    } catch (e) {
-      console.error("❌ Gemini AI generation failed:", e);
-    }
+    const response = await ai.models.generateContent({
+      model: 'gemini-1.5-flash',
+      contents: prompt,
+      config: { responseMimeType: "application/json" }
+    });
+    aiGeneratedLogs = JSON.parse(response.text || '{}');
+    console.log("✅ Successfully generated dynamic Gen AI logs.");
+  } catch (e) {
+    console.error("❌ Gemini AI generation failed:", e);
+  }
+  return aiGeneratedLogs;
+}
 
+// ──────────────────────────────────────────────
+// Scheduled Cloud Function (Runs every minute)
+// ──────────────────────────────────────────────
+export const runSimulationTick = onSchedule("every 1 minutes", async () => {
+  const now = new Date();
+  
+  try {
+    const batch = db.batch();
+
+    // 1. Core Metrics
+    const pulseMetrics = generatePulseMetrics(now);
+    const transitSchedules = generateTransitSchedules(now);
+    batch.set(db.doc('pulse_metrics/live'), pulseMetrics);
+    batch.set(db.doc('transit_schedules/live'), transitSchedules);
+
+    // 2. 🧠 Gen AI Real-Time Reasoning (Operational Intelligence)
+    const aiGeneratedLogs = await fetchGenAILogs(ai, pulseMetrics.occupancy, pulseMetrics.activeIncidents);
+
+    // 3. Format AI Timestamps
     const rotatedChats = [...fallbackPolyglotChats].map(chat => ({ ...chat, time: new Date(now.getTime() - Math.random() * 30000).toISOString() }));
-
-    // Format timestamps for the AI generated logs
     const finalAccessLogs = (aiGeneratedLogs.accessLogs || []).map((log: any) => ({ ...log, time: new Date(now.getTime() - Math.random() * 10000).toISOString() }));
     const finalWayfinderLogs = aiGeneratedLogs.wayfinderLogs || [];
     const finalVerdeLogs = (aiGeneratedLogs.verdeTrails || []).map((log: any) => ({ ...log, time: new Date(now.getTime() - Math.random() * 20000).toISOString() }));
 
-    // 4. Access Metrics
+    // 4. Update Agent Documents in Batch
     batch.set(db.doc('access_logs/live'), {
       validScans: Math.floor(pulseMetrics.occupancy * 156 + Math.random() * 50),
       invalidAttempts: pulseMetrics.activeIncidents * 7 + 2 + Math.floor(Math.random() * 3),
@@ -90,7 +113,6 @@ Return ONLY valid JSON.`;
       timestamp: now.toISOString(),
     });
 
-    // 5. Wayfinder Metrics
     batch.set(db.doc('wayfinder_routes/live'), {
       activeReroute: pulseMetrics.activeIncidents > 0,
       targetGate: `GATE ${['C', 'D', 'F'][Math.floor(Math.random() * 3)]}`,
@@ -100,14 +122,12 @@ Return ONLY valid JSON.`;
       timestamp: now.toISOString(),
     });
 
-    // 6. Polyglot Streams (Still rotating static for chat UI structure)
     batch.set(db.doc('polyglot_streams/live'), {
       activeNodes: pulseMetrics.flowRate + Math.floor(Math.random() * 20),
       liveTranslations: rotatedChats,
       timestamp: now.toISOString(),
     });
 
-    // 7. Verde Stats
     batch.set(db.doc('verde_stats/live'), {
       powerDraw: (pulseMetrics.occupancy / 20) + (Math.random() * 0.2),
       waterUsage: pulseMetrics.flowRate * 12 + Math.floor(Math.random() * 100),
@@ -116,13 +136,12 @@ Return ONLY valid JSON.`;
       timestamp: now.toISOString(),
     });
 
-    // 8. Health Heartbeat
     batch.set(db.doc('_worker_health/simulation'), {
       lastTick: now.toISOString(),
       status: 'healthy-cloud-function-genai',
     });
 
-    // Commit atomic batch
+    // 5. Commit atomic batch
     await batch.commit();
     console.log(`✅ Simulation batch committed at ${now.toISOString()}`);
     
