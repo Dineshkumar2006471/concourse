@@ -20,6 +20,7 @@ functions/node_modules
 
 # production
 /build
+.firebase/
 
 # misc
 .DS_Store
