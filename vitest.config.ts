@@ -8,6 +8,11 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./vitest.setup.ts'],
+    poolOptions: {
+      threads: {
+        singleThread: true
+      }
+    },
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
