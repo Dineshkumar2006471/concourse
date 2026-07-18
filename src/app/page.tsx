@@ -1,4 +1,5 @@
 'use client';
+/* eslint-disable @next/next/no-img-element */
 import Link from 'next/link';
 
 export default function Page() {
@@ -11,14 +12,14 @@ export default function Page() {
 </div>
 {/*  Main Nav  */}
 <nav className="bg-canvas border-b border-line h-topbar-height sticky top-0 w-full z-40 flex justify-between items-center px-margin-desktop md:px-margin-desktop px-margin-mobile">
-<a className="flex items-center" href="#">
+<Link className="flex items-center" href="/">
 <img alt="Concourse Logo" className="h-8" src="/images/logo.png" />
-</a>
+</Link>
 <div className="hidden md:flex gap-6 items-center">
-<a className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-all font-semibold" href="#">Platform</a>
-<a className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-all font-semibold" href="#">Agents</a>
-<a className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-all font-semibold" href="#">Case Studies</a>
-<a className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-all font-semibold" href="#">Security</a>
+<Link className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-all font-semibold" href="/">Platform</Link>
+<Link className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-all font-semibold" href="/">Agents</Link>
+<Link className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-all font-semibold" href="/">Case Studies</Link>
+<Link className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-all font-semibold" href="/">Security</Link>
 </div>
 <div>
 <Link href="/app">
@@ -26,7 +27,7 @@ export default function Page() {
                 Enter Your Match Day
             </button>
 </Link>
-<button className="md:hidden text-on-surface">
+<button className="md:hidden text-on-surface" aria-label="Open Mobile Menu">
 <span className="material-symbols-outlined text-[24px]">menu</span>
 </button>
 </div>
@@ -209,10 +210,10 @@ export default function Page() {
 <span className="font-body-sm text-body-sm text-ink-muted">© 2026 FIFA World Cup Operations. Powered by Concourse AI.</span>
 </div>
 <div className="flex flex-wrap justify-center gap-6">
-<a className="font-body-sm text-body-sm text-ink-muted hover:text-secondary transition-opacity hover:opacity-80" href="#">Privacy Policy</a>
-<a className="font-body-sm text-body-sm text-ink-muted hover:text-secondary transition-opacity hover:opacity-80" href="#">Terms of Service</a>
-<a className="font-body-sm text-body-sm text-ink-muted hover:text-secondary transition-opacity hover:opacity-80" href="#">Security Architecture</a>
-<a className="font-body-sm text-body-sm text-ink-muted hover:text-secondary transition-opacity hover:opacity-80" href="#">Contact Support</a>
+<Link className="font-body-sm text-body-sm text-ink-muted hover:text-secondary transition-opacity hover:opacity-80" href="/">Privacy Policy</Link>
+<Link className="font-body-sm text-body-sm text-ink-muted hover:text-secondary transition-opacity hover:opacity-80" href="/">Terms of Service</Link>
+<Link className="font-body-sm text-body-sm text-ink-muted hover:text-secondary transition-opacity hover:opacity-80" href="/">Security Architecture</Link>
+<Link className="font-body-sm text-body-sm text-ink-muted hover:text-secondary transition-opacity hover:opacity-80" href="/">Contact Support</Link>
 </div>
 </div>
 </footer>

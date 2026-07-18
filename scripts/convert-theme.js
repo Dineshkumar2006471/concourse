@@ -1,3 +1,4 @@
+/* eslint-disable */
 const fs = require('fs');
 
 const str = fs.readFileSync('tailwind-stitch.json', 'utf8');
@@ -67,3 +68,4 @@ body {
 
 fs.writeFileSync('src/app/globals.css', css);
 console.log('Successfully updated globals.css with Stitch theme variables');
+

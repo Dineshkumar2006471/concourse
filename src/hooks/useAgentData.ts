@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
 
+/**
+ * Live pulse data metrics representing overall stadium occupancy and throughput.
+ */
 export type PulseData = {
   occupancy: number;
   flowRate: number;
@@ -93,6 +96,14 @@ const DEFAULT_WAYFINDER: WayfinderData = { activeReroute: false, targetGate: '',
 const DEFAULT_POLYGLOT: PolyglotData = { activeNodes: 0, liveTranslations: [], timestamp: '' };
 const DEFAULT_VERDE: VerdeData = { powerDraw: 0, waterUsage: 0, carbonFootprint: '', reasoningTrail: [], timestamp: '' };
 
+/**
+ * Global hook to subscribe to real-time agent metrics from Firebase Firestore.
+ * This hook establishes WebSocket connections via `onSnapshot` and automatically cleans up
+ * listeners on unmount. Avoid calling this hook in deeply nested components to prevent
+ * excessive re-renders; instead, call it near the top of the component tree and pass data down.
+ *
+ * @returns An object containing live states for all 6 Concourse AI Agents.
+ */
 export function useAgentData() {
   const [pulse, setPulse] = useState<PulseData>(DEFAULT_PULSE);
   const [transit, setTransit] = useState<TransitData>(DEFAULT_TRANSIT);
@@ -103,7 +114,7 @@ export function useAgentData() {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    let unsubs: Array<() => void> = [];
+    const unsubs: Array<() => void> = [];
 
     try {
       unsubs.push(onSnapshot(doc(db, 'pulse_metrics', 'live'), (doc) => {

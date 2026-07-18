@@ -47,7 +47,7 @@ export function AgentScreenLayout({ children, isFullWidth = false, agentName, ch
             {/* Example Chat Message */}
             <div className="flex flex-col gap-1 max-w-[85%]">
               <div className="bg-canvas-alt text-ink p-3 rounded-2xl rounded-tl-sm text-sm leading-relaxed border border-line/50">
-                Hi, I'm the {agentName} agent. How can I help you navigate the stadium today?
+                Hi, I&apos;m the {agentName} agent. How can I help you navigate the stadium today?
               </div>
               <span className="text-[10px] text-ink-muted ml-1">10:42 AM</span>
             </div>

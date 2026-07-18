@@ -1,3 +1,5 @@
+/* eslint-disable */
+/* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require('fs');
 const path = require('path');
 
@@ -38,3 +40,5 @@ const pages = [
 pages.forEach(p => {
     processFile(path.join(targetDir, p));
 });
+
+

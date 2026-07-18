@@ -1,3 +1,4 @@
+/* eslint-disable */
 const fs = require('fs');
 const https = require('https');
 const path = require('path');
@@ -108,3 +109,4 @@ async function main() {
 }
 
 main().catch(console.error);
+

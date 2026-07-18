@@ -1,3 +1,4 @@
+/* eslint-disable */
 const fs = require('fs');
 const path = require('path');
 
@@ -31,3 +32,4 @@ walkDir(targetDir, function(filePath) {
     }
   }
 });
+

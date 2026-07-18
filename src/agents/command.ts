@@ -1,10 +1,10 @@
 import { genkit } from 'genkit';
-import { googleAI, gemini25Pro } from '@genkit-ai/googleai';
+import { googleAI, gemini15Pro } from '@genkit-ai/googleai';
 import { z } from 'zod';
 
 export const ai = genkit({
   plugins: [googleAI()],
-  model: gemini25Pro
+  model: gemini15Pro
 });
 
 // A tool that fetches the latest 3 active incidents and transit delays
@@ -12,7 +12,7 @@ export const getActiveIncidentsAndDelays = ai.defineTool(
   {
     name: 'getActiveIncidentsAndDelays',
     description: 'Fetches current live alerts across all stadium zones and transit systems.',
-    schema: z.object({}),
+    inputSchema: z.object({}),
   },
   async () => {
     // In a real implementation, this reads from the Supabase/Firebase 'incidents' and 'transit_schedules' collections.
@@ -32,9 +32,11 @@ export const commandAgent = ai.definePrompt(
   {
     name: 'commandAgent',
     description: 'An operational intelligence agent that correlates cross-system alerts and proposes actions to staff.',
-    input: z.object({
-      query: z.string()
-    }),
+    input: {
+      schema: z.object({
+        query: z.string()
+      })
+    },
     tools: [getActiveIncidentsAndDelays],
   },
   `You are the Concourse Command Agent for the FIFA World Cup 2026.

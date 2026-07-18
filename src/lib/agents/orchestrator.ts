@@ -1,4 +1,5 @@
-import { ai, SYSTEM_CONTEXT } from '../genkit';
+import { z } from 'zod';
+import { ai } from '../genkit';
 import { wayfinderAgent } from './wayfinder';
 
 // The Orchestrator routes user queries to the correct specialized agent.
@@ -6,21 +7,15 @@ import { wayfinderAgent } from './wayfinder';
 export const orchestratorAgent = ai.defineFlow(
   {
     name: 'orchestratorFlow',
-    inputSchema: ai.defineSchema('OrchestratorInput', {
-      type: 'object',
-      properties: {
-        query: { type: 'string' },
-        venueId: { type: 'string' },
-      }
+    inputSchema: z.object({
+      query: z.string(),
+      venueId: z.string(),
     }),
   },
   async (input) => {
     // In a full implementation, we'd use a classifier or tool-calling LLM to route.
     // For this demo structure, we use basic keyword matching to delegate to Wayfinder.
     const lowerQuery = input.query.toLowerCase();
-    
-    let routedTo = 'Wayfinder';
-    let response;
     
     if (lowerQuery.includes('where') || lowerQuery.includes('how to get') || lowerQuery.includes('navigate')) {
       const wayfinderOutput = await wayfinderAgent({

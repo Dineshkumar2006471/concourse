@@ -1,4 +1,5 @@
-import { ai, SYSTEM_CONTEXT } from '../genkit';
+import { z } from 'zod';
+import { ai } from '../genkit';
 import { db } from '../firebase-admin';
 
 // The Wayfinder Agent handles navigation and routing inside the venue.
@@ -8,33 +9,18 @@ import { db } from '../firebase-admin';
 export const wayfinderAgent = ai.defineFlow(
   {
     name: 'wayfinderFlow',
-    inputSchema: ai.defineSchema('WayfinderInput', {
-      type: 'object',
-      properties: {
-        query: { type: 'string' },
-        venueId: { type: 'string' },
-        currentLocation: { type: 'string' }
-      }
+    inputSchema: z.object({
+      query: z.string(),
+      venueId: z.string(),
+      currentLocation: z.string()
     }),
-    outputSchema: ai.defineSchema('WayfinderOutput', {
-      type: 'object',
-      properties: {
-        response: { type: 'string' },
-        reasoningTrail: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              tool: { type: 'string' },
-              logic: { type: 'string' }
-            }
-          }
-        },
-        suggestedRoute: {
-          type: 'array',
-          items: { type: 'string' }
-        }
-      }
+    outputSchema: z.object({
+      response: z.string(),
+      reasoningTrail: z.array(z.object({
+        tool: z.string(),
+        logic: z.string()
+      })),
+      suggestedRoute: z.array(z.string())
     }),
   },
   async (input) => {
@@ -42,8 +28,8 @@ export const wayfinderAgent = ai.defineFlow(
     // We'll set up a skeleton here that simulates the reasoning trail.
     
     // 1. Tool Call: Fetch Venue Data
-    const venueDoc = await db.collection('venues').doc(input.venueId).get();
-    const venueName = venueDoc.exists ? venueDoc.data()?.name : 'the stadium';
+    const venueDoc = await db?.collection('venues').doc(input.venueId).get();
+    const venueName = venueDoc?.exists ? venueDoc.data()?.name : 'the stadium';
 
     // 2. Mock Agent Logic
     const responseText = `To get to ${input.query} from your current location, proceed down the South Concourse and take Gate B.`;

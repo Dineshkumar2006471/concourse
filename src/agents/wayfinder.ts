@@ -1,10 +1,10 @@
 import { genkit } from 'genkit';
-import { googleAI, gemini25Flash } from '@genkit-ai/googleai';
+import { googleAI, gemini15Flash } from '@genkit-ai/googleai';
 import { z } from 'zod';
 
 export const ai = genkit({
   plugins: [googleAI()],
-  model: gemini25Flash
+  model: gemini15Flash
 });
 
 // A simple tool for the Wayfinder to check if a specific gate is congested
@@ -12,7 +12,7 @@ export const checkGateCongestion = ai.defineTool(
   {
     name: 'checkGateCongestion',
     description: 'Checks the current live crowd density and queue time for a specific gate',
-    schema: z.object({
+    inputSchema: z.object({
       gateId: z.string().describe('The ID of the gate (e.g. Gate 12, Gate 14)')
     }),
   },
@@ -42,9 +42,11 @@ export const wayfinderAgent = ai.definePrompt(
   {
     name: 'wayfinderAgent',
     description: 'An AI assistant that helps fans navigate the stadium dynamically based on live crowd data.',
-    input: z.object({
-      userRequest: z.string()
-    }),
+    input: {
+      schema: z.object({
+        userRequest: z.string()
+      })
+    },
     tools: [checkGateCongestion],
   },
   `You are the Concourse Wayfinder Agent for the FIFA World Cup 2026.

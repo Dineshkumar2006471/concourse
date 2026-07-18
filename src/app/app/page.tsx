@@ -3,7 +3,7 @@ import { useAgentData } from '@/hooks/useAgentData';
 import Link from 'next/link';
 
 export default function Page() {
-  const { pulse, transit, isConnected, wayfinder, verde, polyglot, access } = useAgentData();
+  const { pulse, transit, wayfinder, verde, polyglot, access } = useAgentData();
   return (
     <>
 

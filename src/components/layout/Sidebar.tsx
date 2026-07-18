@@ -1,8 +1,11 @@
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable jsx-a11y/alt-text */
 'use client';
+import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-export function Sidebar() {
+export const Sidebar = React.memo(function Sidebar() {
   const pathname = usePathname();
 
   return (
@@ -70,4 +73,4 @@ export function Sidebar() {
       </div>
     </aside>
   );
-}
+});

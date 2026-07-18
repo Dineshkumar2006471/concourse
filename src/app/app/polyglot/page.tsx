@@ -76,11 +76,11 @@ export default function Page() {
 <div className="p-4 border-t border-line bg-canvas">
 <div className="relative flex items-center">
 <div className="absolute left-3 flex gap-2">
-<button className="text-ink-muted hover:text-primary transition-colors"><span className="material-symbols-outlined text-[20px]">mic</span></button>
-<button className="text-ink-muted hover:text-primary transition-colors"><span className="material-symbols-outlined text-[20px]">translate</span></button>
+<button className="text-ink-muted hover:text-primary transition-colors" aria-label="Toggle Microphone"><span className="material-symbols-outlined text-[20px]">mic</span></button>
+<button className="text-ink-muted hover:text-primary transition-colors" aria-label="Toggle Auto-Translate"><span className="material-symbols-outlined text-[20px]">translate</span></button>
 </div>
 <input className="w-full pl-16 pr-12 py-3 border border-line rounded-lg bg-canvas-alt font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-all" placeholder="Type message to broadcast (auto-translated to relevant sectors)..." type="text"/>
-<button className="absolute right-3 bg-primary text-on-primary w-8 h-8 rounded flex items-center justify-center hover:bg-pitch-hover transition-colors">
+<button className="absolute right-3 bg-primary text-on-primary w-8 h-8 rounded flex items-center justify-center hover:bg-pitch-hover transition-colors" aria-label="Send Message">
 <span className="material-symbols-outlined text-[18px]">send</span>
 </button>
 </div>
@@ -153,7 +153,7 @@ export default function Page() {
 <p className="font-data-md text-[12px] text-ink-muted mb-1">14:02:12 | LOGIC_CORE</p>
 <div className="bg-canvas border border-line rounded p-2 text-body-sm">
 <span className="font-semibold block mb-1">Contextual Override</span>
-<span className="font-data-md text-[11px] text-on-surface-variant">Applying stadium security glossary. 'Multitud' translated as 'crowd' (high density context), not 'audience'.</span>
+<span className="font-data-md text-[11px] text-on-surface-variant">Applying stadium security glossary. &apos;Multitud&apos; translated as &apos;crowd&apos; (high density context), not &apos;audience&apos;.</span>
 </div>
 </div>
 </div>
