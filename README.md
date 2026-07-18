@@ -1,21 +1,42 @@
-# Concourse
+<div align="center">
+  <img src="public/images/logo.png" alt="Concourse Logo" width="120" />
 
-**The AI Operating System for the FIFA World Cup 2026 Stadium Experience**
+  # Concourse
 
-Concourse is a multi-agent nervous system for a stadium. Instead of a standard chatbot, Concourse orchestrates specialized AI agents that own individual verticals (navigation, crowd management, transit, sustainability, accessibility, and multilingual translation). These agents share a real-time data plane, correlate with each other's findings before speaking to a human, and provide transparent "Reasoning Trails" for every decision.
+  **The AI Operating System for the FIFA World Cup 2026 Stadium Experience**
+
+  [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+  [![Hackathon](https://img.shields.io/badge/Hackathon-PromptWars_Virtual_Challenge_4-red.svg)]()
+  [![Powered by Gemini](https://img.shields.io/badge/Powered_by-Gemini_2.5_Flash-4285F4.svg)]()
+  [![TypeScript](https://img.shields.io/badge/TypeScript-Strict-3178C6.svg)]()
+  [![Next.js](https://img.shields.io/badge/Built_with-Next.js_14-black.svg)]()
+
+  *Concourse transforms stadium operations from static dashboards into a fully autonomous, real-time nervous system powered by a swarm of specialized AI agents.*
+</div>
 
 ---
 
-## 1. Problem Statement
+## 📑 Table of Contents
+- [Problem Statement](#-problem-statement)
+- [Solution: The Concourse Agent Mesh](#-solution-the-concourse-agent-mesh)
+- [Architecture & Tech Stack](#-architecture--tech-stack)
+- [Features & Workflow](#-features--workflow)
+- [Project Structure](#-project-structure)
+- [Environment Setup](#-environment-setup)
+- [License](#-license)
 
-> **[Challenge 4] Smart Stadiums & Tournament Operations**
-> Build a GenAI-enabled solution that enhances stadium operations and the overall tournament experience for fans, organizers, volunteers, or venue staff. 
+---
+
+## 🎯 Problem Statement
+
+> **[Challenge 4] Smart Stadiums & Tournament Operations**  
+> Build a GenAI-enabled solution that enhances stadium operations and the overall tournament experience for fans, organizers, volunteers, or venue staff.
 
 Most solutions approach this by building a single chatbot. Concourse approaches this by treating the stadium as a live, pulsing entity. We cover navigation, crowd management, accessibility, transportation, sustainability, and multilingual assistance through operational intelligence and real-time decision support as *emergent properties* of how the agents talk to each other.
 
 ---
 
-## 2. Solution: The Concourse Agent Mesh
+## 🧠 Solution: The Concourse Agent Mesh
 
 Concourse utilizes six distinct AI Agents, orchestrated through Genkit and powered by Gemini 2.5 Flash & Pro.
 
@@ -27,11 +48,22 @@ Concourse utilizes six distinct AI Agents, orchestrated through Genkit and power
 6. **Access** — Credentialing, biometric ticketing, and security zone control.
 
 ### The "Reasoning Trail"
-Concourse doesn't just give commands; it shows its work. Every agent response in the UI features an expandable "Reasoning Trail" detailing the exact data read, the timestamps, and the intermediate reasoning before the final recommendation. This ensures transparency, prevents black-box AI decisions, and establishes trust.
+Concourse doesn't just give commands; it shows its work. Every agent response in the UI features an expandable **Reasoning Trail** detailing the exact data read, the timestamps, and the intermediate reasoning before the final recommendation. This ensures transparency, prevents black-box AI decisions, and establishes trust.
 
 ---
 
-## 3. Architecture Diagram
+## 🏗️ Architecture & Tech Stack
+
+Concourse is built on a modern, real-time technology stack designed to handle live data streams with zero polling:
+
+### Core Technologies
+- **Frontend:** Next.js 14+ (App Router) & React. Provides a fast, responsive UI with file-based routing.
+- **Styling:** Tailwind CSS. Custom, high-contrast dark mode aesthetic tailored for a stadium command center.
+- **Real-Time Data Plane:** Firebase Firestore. Serves as the central nervous system. WebSockets push updates instantly to the React frontend via the `useAgentData` hook.
+- **Simulation Engine:** Node.js & TypeScript Worker. A background worker (`scripts/simulation-worker.ts`) ticking every 5 seconds to generate realistic queueing math and synthetic alerts.
+- **AI Orchestration:** Gemini 2.5 Flash & Pro (via Genkit). Powers the agent logic and generates the structured "Reasoning Trails".
+
+### Data Flow Diagram
 
 ```mermaid
 graph TD
@@ -62,31 +94,23 @@ graph TD
 
 ---
 
-## 4. Tech Stack & Implementation Details
+## ⚡ Features & Workflow
 
-Concourse is built on a modern, real-time technology stack designed to handle live data streams with zero polling:
-
-- **Frontend Framework: Next.js 14+ (App Router) & React** 
-  Provides a fast, responsive user interface with file-based routing. The entire command dashboard and the individual agent screens are built as separate React routes for clean separation of concerns.
-- **Styling: Tailwind CSS**
-  Used for atomic, utility-first styling. We designed a custom, high-contrast dark mode aesthetic tailored specifically for a stadium command center, entirely driven by Tailwind utility classes.
-- **Real-Time Data Plane: Firebase Firestore**
-  Serves as the central nervous system. Rather than polling an API, the frontend maintains active WebSocket connections to Firestore via the `useAgentData` React hook. As soon as a document is updated in the database, the UI updates instantly.
-- **Simulation Engine: Node.js & TypeScript Worker**
-  Since live IoT sensor data for stadiums isn't public, we built an honest, provably real-time simulation engine (`scripts/simulation-worker.ts`). This worker runs a loop every 5 seconds, computing realistic queueing math, generating synthetic alerts, and writing them directly into Firestore.
-- **AI Orchestration: Gemini 2.5 Flash & Pro (Conceptual)**
-  The logic and data generation is modeled after Genkit and Gemini's capabilities. Instead of a standard chatbot, the AI produces structured "Reasoning Trails", breaking down *why* a decision was made (e.g., detecting a crowd spike, cross-referencing with transit delays, and issuing a reroute).
+1. **Landing Page:** A dynamic landing page explaining the platform, featuring the 6 agent modules and a live-simulated marquee.
+2. **Command Dashboard (`/app`):** The central nervous system. Provides high-level health of the stadium. Automatically flags "SYSTEM ALERT" if spikes (e.g., occupancy) are detected.
+3. **Cross-Agent Ripple Effect:** Alerts trigger reactions across agents. An alert in Pulse causes Wayfinder to flag an "ACTIVE REROUTE" and Access to update breach detection—all pushed in real-time.
+4. **Agent Deep-Dives:** Granular, live-updating Reasoning Trails inside each agent's dedicated screen, showing exactly how the AI identified an anomaly and resolved it.
 
 ---
 
-## 5. Project Structure Diagram
+## 📁 Project Structure
 
 ```text
 concourse/
 ├── public/                 # Static assets and images
 │   └── images/
 ├── scripts/
-│   └── simulation-worker.ts # Node.js script simulating live stadium data & agent logic
+│   └── simulation-worker.ts # Node.js script simulating live stadium data
 ├── src/
 │   ├── app/
 │   │   ├── app/            # Command Dashboard and Agent Pages
@@ -110,33 +134,27 @@ concourse/
 
 ---
 
-## 6. UI Flow and Workflow Explanation
-
-1. **Landing Page:** The user is greeted by a high-conversion, dynamic landing page explaining the Concourse platform, featuring the 6 agent modules and a live-simulated marquee.
-2. **Command Dashboard (`/app`):** The central nervous system. The user views the high-level health of the stadium. If the Pulse agent detects a spike in occupancy, the dashboard instantly flags a "SYSTEM ALERT".
-3. **Cross-Agent Ripple Effect:** When an alert is triggered in Pulse, Wayfinder immediately flags an "ACTIVE REROUTE" to divert traffic, and Access updates its breach detection. All of this is pushed to the UI in real-time.
-4. **Agent Deep-Dives:** The user can click into any agent (e.g., `/app/wayfinder`) to see the granular, live-updating Reasoning Trail (the exact log sequence of how the AI identified the anomaly and resolved it).
-
----
-
-## 7. How to Setup the Environment
+## ⚙️ Environment Setup
 
 ### Prerequisites
 - Node.js (v18+)
 - Firebase Account (for Firestore)
 
 ### Installation
-1. Clone the repository:
+
+1. **Clone the repository**
    ```bash
    git clone https://github.com/Dineshkumar2006471/concourse.git
    cd concourse
    ```
-2. Install dependencies:
+
+2. **Install dependencies**
    ```bash
    npm install
    ```
-3. Set up environment variables:
-   Create a `.env.local` file in the root directory and add your Firebase credentials:
+
+3. **Configure Environment Variables**
+   Create a `.env.local` file in the root directory:
    ```env
    NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
    NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
@@ -148,19 +166,22 @@ concourse/
 
 ### Running the Application
 
-1. **Start the Live Simulation Worker:**
-   This script drives the real-time data for the agents. Keep this running in a separate terminal.
+1. **Start the Live Simulation Worker**
+   Run the background process to generate real-time metrics:
    ```bash
    npx tsx scripts/simulation-worker.ts
    ```
-2. **Start the Next.js Development Server:**
+
+2. **Start the Next.js Dev Server**
    ```bash
    npm run dev
    ```
-3. Open `http://localhost:3000` in your browser.
+
+3. **Open the App**
+   Navigate to `http://localhost:3000` in your browser.
 
 ---
 
-## 8. License
+## 📜 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
