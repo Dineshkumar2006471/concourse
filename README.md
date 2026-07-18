@@ -1,187 +1,178 @@
 <div align="center">
   <img src="public/images/logo.png" alt="Concourse Logo" width="120" />
+  <h1>Concourse: AI Venue Command Center</h1>
+  <p><em>Real-time, multi-agent simulation and logistics dashboard for mega-venue management.</em></p>
 
-  # Concourse
-
-  **The AI Operating System for the FIFA World Cup 2026 Stadium Experience**
-
-  [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-  [![Hackathon](https://img.shields.io/badge/Hackathon-PromptWars_Virtual_Challenge_4-red.svg)]()
-  [![Powered by Gemini](https://img.shields.io/badge/Powered_by-Gemini_2.5_Flash-4285F4.svg)]()
-  [![TypeScript](https://img.shields.io/badge/TypeScript-Strict-3178C6.svg)]()
-  [![Next.js](https://img.shields.io/badge/Built_with-Next.js_14-black.svg)]()
-
-  *Concourse transforms stadium operations from static dashboards into a fully autonomous, real-time nervous system powered by a swarm of specialized AI agents.*
+  [![CI/CD Pipeline](https://github.com/Dineshkumar2006471/concourse/actions/workflows/ci.yml/badge.svg)](https://github.com/Dineshkumar2006471/concourse/actions/workflows/ci.yml)
+  [![Next.js](https://img.shields.io/badge/Next.js-15.0-black?logo=next.js)](https://nextjs.org/)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript)](https://www.typescriptlang.org/)
+  [![Firebase](https://img.shields.io/badge/Firebase-Admin-FFCA28?logo=firebase)](https://firebase.google.com/)
+  [![Accessibility](https://img.shields.io/badge/a11y-Strict-green)]()
 </div>
 
 ---
 
-## 📑 Table of Contents
-- [Problem Statement](#-problem-statement)
-- [Solution: The Concourse Agent Mesh](#-solution-the-concourse-agent-mesh)
-- [Architecture & Tech Stack](#-architecture--tech-stack)
-- [Features & Workflow](#-features--workflow)
-- [Project Structure](#-project-structure)
-- [Environment Setup](#-environment-setup)
-- [License](#-license)
+## 📖 Table of Contents
+- [Project Overview](#-project-overview)
+- [System Architecture](#-system-architecture)
+- [The 6 AI Agents](#-the-6-ai-agents)
+- [Tech Stack](#-tech-stack)
+- [Enterprise Standards (Security & A11y)](#-enterprise-standards-security--a11y)
+- [Getting Started](#-getting-started)
+- [Testing & Quality Gates](#-testing--quality-gates)
 
 ---
 
-## 🎯 Problem Statement
+## 🎯 Project Overview
 
-> **[Challenge 4] Smart Stadiums & Tournament Operations**  
-> Build a GenAI-enabled solution that enhances stadium operations and the overall tournament experience for fans, organizers, volunteers, or venue staff.
+**Concourse** is a prototype AI-driven command center designed for mega-venues (like stadiums hosting the FIFA World Cup). It replaces traditional, fragmented operational dashboards with a unified, real-time interface powered by **six specialized AI agent models**. 
 
-Most solutions approach this by building a single chatbot. Concourse approaches this by treating the stadium as a live, pulsing entity. We cover navigation, crowd management, accessibility, transportation, sustainability, and multilingual assistance through operational intelligence and real-time decision support as *emergent properties* of how the agents talk to each other.
-
----
-
-## 🧠 Solution: The Concourse Agent Mesh
-
-Concourse utilizes six distinct AI Agents, orchestrated through Genkit and powered by Gemini 2.5 Flash & Pro.
-
-1. **Wayfinder** — Dynamic crowd flow and spatial optimization routing. Reads live density from Pulse before proposing a route.
-2. **Pulse** — Venue health and capacity monitoring. Owns the Live Simulation Engine and forecasting.
-3. **Transit** — External logistics, arrivals tracking, and public transport sync.
-4. **Verde** — Sustainability and energy management, tracking live carbon footprint and grid draw.
-5. **Polyglot** — Instant multi-lingual translation for global fan bases and staff radios.
-6. **Access** — Credentialing, biometric ticketing, and security zone control.
-
-### The "Reasoning Trail"
-Concourse doesn't just give commands; it shows its work. Every agent response in the UI features an expandable **Reasoning Trail** detailing the exact data read, the timestamps, and the intermediate reasoning before the final recommendation. This ensures transparency, prevents black-box AI decisions, and establishes trust.
+The system continuously simulates live venue data—ranging from crowd density and transit logistics to multi-lingual translations and power consumption—streaming it directly to the Next.js frontend via Firebase WebSockets.
 
 ---
 
-## 🏗️ Architecture & Tech Stack
+## 🏗 System Architecture
 
-Concourse is built on a modern, real-time technology stack designed to handle live data streams with zero polling:
-
-### Core Technologies
-- **Frontend:** Next.js 14+ (App Router) & React. Provides a fast, responsive UI with file-based routing.
-- **Styling:** Tailwind CSS. Custom, high-contrast dark mode aesthetic tailored for a stadium command center.
-- **Real-Time Data Plane:** Firebase Firestore. Serves as the central nervous system. WebSockets push updates instantly to the React frontend via the `useAgentData` hook.
-- **Simulation Engine:** Node.js & TypeScript Worker. A background worker (`scripts/simulation-worker.ts`) ticking every 5 seconds to generate realistic queueing math and synthetic alerts.
-- **AI Orchestration:** Gemini 2.5 Flash & Pro (via Genkit). Powers the agent logic and generates the structured "Reasoning Trails".
-
-### Data Flow Diagram
+The architecture decouples the high-frequency AI simulation data generation from the client UI presentation layer, ensuring high performance and security.
 
 ```mermaid
 graph TD
-    SIM[Live Simulation Engine Worker] -->|Writes every 5s| DB[(Firebase Firestore)]
-    DB -->|Realtime Subscriptions| HOOK[useAgentData Hook]
+    %% Define Styles
+    classDef client fill:#f9f9f9,stroke:#333,stroke-width:2px;
+    classDef cloud fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
+    classDef backend fill:#fff3e0,stroke:#f57c00,stroke-width:2px;
 
-    HOOK --> W[Wayfinder Agent]
-    HOOK --> P[Pulse Agent]
-    HOOK --> T[Transit Agent]
-    HOOK --> V[Verde Agent]
-    HOOK --> PL[Polyglot Agent]
-    HOOK --> A[Access Agent]
+    %% Client Layer
+    subgraph Client [Next.js App Router Frontend]
+        UI[React UI Components]
+        Hook[useAgentData Hook]
+        EB[Strict Error Boundaries]
+        UI <--> Hook
+        Hook --> EB
+    end
+    class Client client
 
-    W --> UI1[Wayfinder Map]
-    P --> UI2[Dashboard Alerts]
-    T --> UI3[Transit Boards]
-    V --> UI4[HVAC & Grid]
-    PL --> UI5[Live Comms]
-    A --> UI6[Zone Control]
-        
-    UI1 --> CT[Command Dashboard]
-    UI2 --> CT
-    UI3 --> CT
-    UI4 --> CT
-    UI5 --> CT
-    UI6 --> CT
+    %% Data Layer
+    subgraph Firebase [Firebase Realtime Data Layer]
+        FS[(Firestore Database)]
+        Rules[firestore.rules \n Client: Read-Only]
+        FS --- Rules
+    end
+    class Firebase cloud
+
+    %% Backend Layer
+    subgraph Backend [AI Simulation Worker / Admin]
+        Worker[Node.js Admin SDK]
+        A1[Pulse] --- Worker
+        A2[Wayfinder] --- Worker
+        A3[Transit] --- Worker
+        A4[Verde] --- Worker
+        A5[Polyglot] --- Worker
+        A6[Access] --- Worker
+    end
+    class Backend backend
+
+    %% Connections
+    Hook -- "onSnapshot (WebSocket)" --> FS
+    Worker -- "Atomic Batch Writes" --> FS
 ```
 
 ---
 
-## ⚡ Features & Workflow
+## 🤖 The 6 AI Agents
 
-1. **Landing Page:** A dynamic landing page explaining the platform, featuring the 6 agent modules and a live-simulated marquee.
-2. **Command Dashboard (`/app`):** The central nervous system. Provides high-level health of the stadium. Automatically flags "SYSTEM ALERT" if spikes (e.g., occupancy) are detected.
-3. **Cross-Agent Ripple Effect:** Alerts trigger reactions across agents. An alert in Pulse causes Wayfinder to flag an "ACTIVE REROUTE" and Access to update breach detection—all pushed in real-time.
-4. **Agent Deep-Dives:** Granular, live-updating Reasoning Trails inside each agent's dedicated screen, showing exactly how the AI identified an anomaly and resolved it.
+Concourse simulates the intelligence of six distinct operational areas:
 
----
-
-## 📁 Project Structure
-
-```text
-concourse/
-├── public/                 # Static assets and images
-│   └── images/
-├── scripts/
-│   └── simulation-worker.ts # Node.js script simulating live stadium data
-├── src/
-│   ├── app/
-│   │   ├── app/            # Command Dashboard and Agent Pages
-│   │   │   ├── access/     # Access Agent Screen
-│   │   │   ├── polyglot/   # Polyglot Agent Screen
-│   │   │   ├── pulse/      # Pulse Agent Screen
-│   │   │   ├── transit/    # Transit Agent Screen
-│   │   │   ├── verde/      # Verde Agent Screen
-│   │   │   ├── wayfinder/  # Wayfinder Agent Screen
-│   │   │   └── page.tsx    # Main Command Center Dashboard
-│   │   ├── page.tsx        # Public Landing Page
-│   │   ├── layout.tsx
-│   │   └── globals.css     # Design tokens and tailwind imports
-│   ├── components/         # Reusable React components (Sidebar, AppShell)
-│   └── hooks/
-│       └── useAgentData.ts # Global hook subscribing to Firebase Firestore
-├── package.json
-├── tailwind.config.ts
-└── tsconfig.json
-```
+1. **Pulse (Venue Health):** Monitors active incidents, total stadium occupancy, and crowd flow rates, triggering localized UI hotspots when thresholds are breached.
+2. **Wayfinder (Spatial Routing):** Dynamically reroutes crowd flow away from congested gates to maintain physical capacity limits.
+3. **Transit (Logistics):** Tracks inbound logistics, managing ETAs and capacities for trains and buses connecting to the venue.
+4. **Verde (Sustainability):** Analyzes grid power draw and potable water usage, outputting actionable AI recommendations to reduce carbon footprints.
+5. **Polyglot (Translation):** Listens to live audio feeds and broadcasts automated, multi-lingual translations to relevant international fan sectors.
+6. **Access (Security):** Monitors credential scans, detecting VIP movements and flagging unauthorized zone breaches with detailed reasoning trails.
 
 ---
 
-## ⚙️ Environment Setup
+## 💻 Tech Stack
+
+| Domain | Technology | Description |
+|---|---|---|
+| **Frontend Framework** | `Next.js 15` (App Router) | React framework utilizing Server and Client Components. |
+| **Styling** | `Tailwind CSS` | Utility-first CSS framework mapped to custom design tokens. |
+| **Icons & Assets** | `Material Symbols` | Google's variable icon font (`outlined` variant). |
+| **Realtime DB** | `Firebase Firestore` | NoSQL document database providing WebSocket `onSnapshot` listeners. |
+| **Backend Worker** | `Node.js` + `firebase-admin`| Headless worker simulating AI data streams via atomic batches. |
+| **Testing** | `Vitest` + `RTL` | High-speed unit and component testing. |
+| **Linting** | `ESLint` + `jsx-a11y` | Strict static analysis enforcing code purity and accessibility. |
+
+---
+
+## 🛡 Enterprise Standards (Security & A11y)
+
+This prototype has been heavily audited to meet strict production-grade standards:
+
+- **Accessibility (A11y):** Achieves near-perfect semantic compliance. Implements `role="main"` landmarks, `aria-live` regions for critical alerts, and explicit `aria-label` tags for all icon-only buttons. Enforced continuously in CI via `eslint-plugin-jsx-a11y`.
+- **Fault Tolerance:** Global and Route-Segment Error Boundaries (`error.tsx`, `global-error.tsx`) prevent UI crashes. The centralized `useAgentData` hook manages connection state machines and stale-data detection.
+- **Security:** Clients are blocked from writing to the database via strict `firestore.rules`. All strings injected into the UI pass through a robust XSS sanitizer (`sanitize.ts`).
+- **Data Integrity:** Strict TypeScript interfaces and runtime schema parsers (`src/types/firestore.ts`) ensure the UI never faults on malformed payloads.
+
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js (v18+)
-- Firebase Account (for Firestore)
+- Node.js `22.x` or higher
+- A Firebase project with Firestore enabled.
 
-### Installation
+### 1. Installation
+```bash
+git clone https://github.com/Dineshkumar2006471/concourse.git
+cd concourse
+npm install
+```
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/Dineshkumar2006471/concourse.git
-   cd concourse
-   ```
+### 2. Environment Variables
+Create a `.env.local` file in the root directory:
+```env
+NEXT_PUBLIC_FIREBASE_API_KEY="your-api-key"
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="your-domain"
+NEXT_PUBLIC_FIREBASE_PROJECT_ID="your-project-id"
+```
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+*Note: For the backend simulation worker, you must place your Firebase Admin Service Account JSON at `firebase-service-account.json`.*
 
-3. **Configure Environment Variables**
-   Create a `.env.local` file in the root directory:
-   ```env
-   NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
-   NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
-   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-storage-bucket
-   NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
-   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-auth-domain
-   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
-   ```
+### 3. Running the Stack
+You need two terminal windows to run the full simulation.
 
-### Running the Application
+**Terminal 1 (Frontend):**
+```bash
+npm run dev
+```
 
-1. **Start the Live Simulation Worker**
-   Run the background process to generate real-time metrics:
-   ```bash
-   npx tsx scripts/simulation-worker.ts
-   ```
-
-2. **Start the Next.js Dev Server**
-   ```bash
-   npm run dev
-   ```
-
-3. **Open the App**
-   Navigate to `http://localhost:3000` in your browser.
+**Terminal 2 (AI Simulation Worker):**
+```bash
+npx tsx scripts/simulation-worker.ts
+```
 
 ---
 
-## 📜 License
+## 🧪 Testing & Quality Gates
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This repository enforces strict CI/CD quality gates. You can run validations locally:
+
+```bash
+# 1. Run strict TypeScript compiler check (no emitting)
+npx tsc --noEmit
+
+# 2. Run ESLint (including accessibility rules)
+npm run lint
+
+# 3. Run the Vitest test suite
+npm run test
+```
+
+A production build will only succeed if all linting, type-checking, and tests pass.
+
+---
+<div align="center">
+  <p>Built for the future of mega-event operations.</p>
+</div>
