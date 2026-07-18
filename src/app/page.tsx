@@ -42,7 +42,7 @@ export default function Page() {
 <div className="pt-4 flex gap-4">
 <Link href="/app">
 <button className="bg-primary hover:bg-pitch-hover text-on-primary font-display-lg font-medium text-[16px] px-8 py-3 rounded transition-colors tracking-wide flex items-center justify-center gap-2 whitespace-nowrap w-fit">
-                    Request Demo <span className="material-symbols-outlined text-[20px]" data-original-icon="arrow_forward">arrow_forward</span>
+                    Request Demo <span aria-hidden="true" className="material-symbols-outlined text-[20px]" data-original-icon="arrow_forward">arrow_forward</span>
 </button>
 </Link>
 </div>
@@ -88,7 +88,7 @@ export default function Page() {
                     Built for the scale of the World Cup, Concourse processes millions of data points per second to deliver actionable intelligence when milliseconds matter.
                 </p>
 <button className="text-primary font-display-lg font-medium hover:underline flex items-center gap-1">
-                    Read the Architecture Whitepaper <span className="material-symbols-outlined text-[18px]" data-original-icon="arrow_outward">arrow_outward</span>
+                    Read the Architecture Whitepaper <span aria-hidden="true" className="material-symbols-outlined text-[18px]" data-original-icon="arrow_outward">arrow_outward</span>
 </button>
 </div>
 <div className="space-y-8 bg-canvas p-8 rounded-xl border border-line">
@@ -141,7 +141,7 @@ export default function Page() {
 <h3 className="font-headline-md text-headline-md text-on-surface mb-2">Wayfinder</h3>
 <p className="font-body-md text-body-md text-on-surface-variant mb-4">Dynamic crowd routing and congestion prediction.</p>
 <div className="font-data-md text-data-md text-primary flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        View Specs <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                        View Specs <span aria-hidden="true" className="material-symbols-outlined text-[16px]">arrow_forward</span>
 </div>
 </div>
 {/*  Agent 2  */}
@@ -152,7 +152,7 @@ export default function Page() {
 <h3 className="font-headline-md text-headline-md text-on-surface mb-2">Pulse</h3>
 <p className="font-body-md text-body-md text-on-surface-variant mb-4">Real-time incident detection and security sentiment analysis.</p>
 <div className="font-data-md text-data-md text-primary flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        View Specs <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                        View Specs <span aria-hidden="true" className="material-symbols-outlined text-[16px]">arrow_forward</span>
 </div>
 </div>
 {/*  Agent 3  */}
@@ -163,7 +163,7 @@ export default function Page() {
 <h3 className="font-headline-md text-headline-md text-on-surface mb-2">Transit</h3>
 <p className="font-body-md text-body-md text-on-surface-variant mb-4">Inbound/outbound logistics and public transport sync.</p>
 <div className="font-data-md text-data-md text-primary flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        View Specs <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                        View Specs <span aria-hidden="true" className="material-symbols-outlined text-[16px]">arrow_forward</span>
 </div>
 </div>
 {/*  Agent 4  */}
@@ -174,7 +174,7 @@ export default function Page() {
 <h3 className="font-headline-md text-headline-md text-on-surface mb-2">Verde</h3>
 <p className="font-body-md text-body-md text-on-surface-variant mb-4">Energy optimization and environmental controls.</p>
 <div className="font-data-md text-data-md text-primary flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        View Specs <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                        View Specs <span aria-hidden="true" className="material-symbols-outlined text-[16px]">arrow_forward</span>
 </div>
 </div>
 {/*  Agent 5  */}
@@ -185,7 +185,7 @@ export default function Page() {
 <h3 className="font-headline-md text-headline-md text-on-surface mb-2">Polyglot</h3>
 <p className="font-body-md text-body-md text-on-surface-variant mb-4">Instant multi-lingual translation for global fan bases.</p>
 <div className="font-data-md text-data-md text-primary flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        View Specs <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                        View Specs <span aria-hidden="true" className="material-symbols-outlined text-[16px]">arrow_forward</span>
 </div>
 </div>
 {/*  Agent 6  */}
@@ -196,7 +196,7 @@ export default function Page() {
 <h3 className="font-headline-md text-headline-md text-on-surface mb-2">Access</h3>
 <p className="font-body-md text-body-md text-on-surface-variant mb-4">Biometric ticketing and restricted zone monitoring.</p>
 <div className="font-data-md text-data-md text-primary flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        View Specs <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                        View Specs <span aria-hidden="true" className="material-symbols-outlined text-[16px]">arrow_forward</span>
 </div>
 </div>
 </div>

@@ -1,4 +1,4 @@
-import { renderHook, act } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 import { useAgentData } from '@/hooks/useAgentData';
 import { vi, describe, it, expect, beforeEach, Mock } from 'vitest';
 import { onSnapshot, doc } from 'firebase/firestore';

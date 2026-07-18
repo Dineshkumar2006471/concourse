@@ -55,7 +55,7 @@ export default function Page() {
 <span className="material-symbols-outlined text-primary">memory</span>
                     Active AI Agents
                 </h3>
-<span className={`font-label-caps text-label-caps ${pulse?.activeIncidents > 0 ? 'text-signal animate-pulse' : 'text-ink-muted'}`} role="status" aria-live="assertive">
+<span className={`font-label-caps text-label-caps ${pulse?.activeIncidents > 0 ? 'text-signal animate-pulse' : 'text-ink-muted'}`} role="status" aria-live="polite">
                     {pulse?.activeIncidents > 0 ? 'SYSTEM ALERT' : 'System Nominal'}
                 </span>
 </div>

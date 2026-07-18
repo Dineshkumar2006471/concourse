@@ -1,6 +1,7 @@
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as admin from "firebase-admin";
 import { GoogleGenAI } from "@google/genai";
+import { z } from "zod";
 
 // Initialize Firebase Admin
 admin.initializeApp();
@@ -9,7 +10,7 @@ const db = admin.firestore();
 // Initialize Google Gen AI
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GENAI_API_KEY });
 
-// Static fallbacks in case the AI fails or times out
+// Static fallbacks for Chat UI
 const fallbackPolyglotChats = [
   { sender: 'Gate C Security (Radio)', lang: 'ES-AR', source: '"Necesitamos refuerzos en la puerta tres, la multitud se está empujando."', translated: '"We need backup at gate three, the crowd is pushing."', conf: 98, align: 'left' },
   { sender: 'Polyglot Agent', lang: 'EN-US', source: '"Copy Gate C. Dispatching Crowd Control Unit Alpha. ETA 2 minutes."', translated: '"Copiado Puerta C. Despachando Unidad de Control de Multitudes Alfa. Tiempo estimado 2 minutos."', conf: 100, align: 'right', isAgent: true },
@@ -17,66 +18,120 @@ const fallbackPolyglotChats = [
 ];
 
 // ──────────────────────────────────────────────
-// Helper Functions for Data Generation
+// Strict AI Payload Schema (Zod)
 // ──────────────────────────────────────────────
+const GenAIPayloadSchema = z.object({
+  state: z.object({
+    occupancy: z.number(),
+    flowRate: z.number(),
+    activeIncidents: z.number(),
+    powerDraw: z.number(),
+    waterUsage: z.number(),
+    carbonFootprint: z.string(),
+    transitDelayed: z.boolean(),
+    activeReroute: z.boolean(),
+    targetGate: z.string(),
+  }),
+  logs: z.object({
+    accessLogs: z.array(z.object({
+      type: z.enum(['sensor', 'group', 'agent', 'conclusion']),
+      message: z.string(),
+      submessage: z.string().optional(),
+      icon: z.string(),
+      color: z.string(),
+      bg: z.string(),
+    })),
+    wayfinderLogs: z.array(z.object({
+      type: z.string(),
+      title: z.string(),
+      message: z.string(),
+      icon: z.string(),
+      color: z.string(),
+      bg: z.string(),
+    })),
+    verdeTrails: z.array(z.object({
+      message: z.string(),
+      type: z.enum(['log', 'recommendation']),
+      submessage: z.string().optional(),
+      savings: z.string().optional(),
+    }))
+  })
+});
+
+type GenAIPayload = z.infer<typeof GenAIPayloadSchema>;
 
 /**
- * Generates randomized pulse metrics for crowd management.
+ * Fallback state if AI hallucination occurs
  */
-function generatePulseMetrics(now: Date) {
+function getFallbackState(): GenAIPayload {
   return {
-    occupancy: Math.floor(Math.random() * (95 - 75 + 1) + 75),
-    flowRate: Math.floor(Math.random() * (120 - 80 + 1) + 80),
-    activeIncidents: Math.floor(Math.random() * 3),
-    timestamp: now.toISOString(),
+    state: {
+      occupancy: 85,
+      flowRate: 100,
+      activeIncidents: 0,
+      powerDraw: 4.2,
+      waterUsage: 1200,
+      carbonFootprint: "-12.4%",
+      transitDelayed: false,
+      activeReroute: false,
+      targetGate: "GATE C",
+    },
+    logs: {
+      accessLogs: [],
+      wayfinderLogs: [],
+      verdeTrails: []
+    }
   };
 }
 
 /**
- * Generates transit schedules for transportation logistics.
+ * Invokes Gemini AI to dictate the absolute state of the stadium and generate reasoning trails.
  */
-function generateTransitSchedules(now: Date) {
-  return {
-    trains: [
-      { line: 'NJT Meadowlands Rail', status: 'On Time', time: `${Math.floor(Math.random() * 15 + 1)}m`, color: 'bg-pitch' },
-      { line: 'Coach USA 351 Bus', status: Math.random() > 0.8 ? 'Delayed' : 'On Time', time: `${Math.floor(Math.random() * 30 + 10)}m`, color: Math.random() > 0.8 ? 'bg-signal' : 'bg-pitch' },
-      { line: 'NJT Secaucus Shuttle', status: 'On Time', time: '24m', color: 'bg-pitch' },
-    ],
-    timestamp: now.toISOString(),
-  };
-}
-
-/**
- * Invokes Gemini AI to generate operational intelligence reasoning trails.
- */
-async function fetchGenAILogs(ai: GoogleGenAI, occupancy: number, activeIncidents: number) {
-  let aiGeneratedLogs: any = {};
+export async function fetchGenAIState(): Promise<GenAIPayload> {
   try {
-    const prompt = `You are the AI brain of 'Concourse', a massive stadium management system.
-Current stadium occupancy: ${occupancy}%
-Active incidents: ${activeIncidents}
+    const prompt = `You are the AI brain of 'Concourse', a massive stadium management system for the FIFA World Cup 2026.
+You are directly in control of the simulation numerical state and the operational logs.
 
-Generate a JSON object containing 3 arrays of realistic simulation logs based on the current context:
-1. 'accessLogs': 4 objects with { type, message, submessage, icon, color, bg }. 
-   (Icons: 'sensors', 'group', 'check', 'warning'. Colors: 'text-ink-muted', 'text-white', 'text-error'. Backgrounds: 'bg-surface-container', 'bg-secondary', 'bg-error-container')
-2. 'wayfinderLogs': 3 objects with { type, message, title, icon, color, bg }.
-   (Icons: 'warning', 'analytics', 'alt_route', 'cast')
-3. 'verdeTrails': 3 objects with { message, type: 'log' | 'recommendation', submessage, savings }.
-   (Make it about HVAC, power, or water).
+Generate a JSON object conforming EXACTLY to this schema:
+{
+  "state": {
+    "occupancy": number (75-100),
+    "flowRate": number (80-150),
+    "activeIncidents": number (0-5),
+    "powerDraw": number (3.0-5.0),
+    "waterUsage": number (1000-2000),
+    "carbonFootprint": string (e.g. "-12.4%"),
+    "transitDelayed": boolean,
+    "activeReroute": boolean,
+    "targetGate": string (e.g. "GATE C")
+  },
+  "logs": {
+    "accessLogs": [4 objects with { type, message, submessage, icon, color, bg }],
+    "wayfinderLogs": [3 objects with { type, title, message, icon, color, bg }],
+    "verdeTrails": [3 objects with { message, type: 'log'|'recommendation', submessage, savings }]
+  }
+}
 
-Return ONLY valid JSON.`;
+Use context: Imagine a high-stakes match is happening. Ensure the logs logically match the numerical state you generate.
+Return ONLY valid JSON without markdown formatting.`;
 
     const response = await ai.models.generateContent({
       model: 'gemini-1.5-flash',
       contents: prompt,
       config: { responseMimeType: "application/json" }
     });
-    aiGeneratedLogs = JSON.parse(response.text || '{}');
-    console.log("✅ Successfully generated dynamic Gen AI logs.");
+    
+    const parsedJson = JSON.parse(response.text || '{}');
+    
+    // Strict runtime validation
+    const validatedData = GenAIPayloadSchema.parse(parsedJson);
+    console.log("✅ Successfully generated and validated dynamic Gen AI state.");
+    return validatedData;
+    
   } catch (e) {
-    console.error("❌ Gemini AI generation failed:", e);
+    console.error("❌ Gemini AI generation or Zod validation failed. Using fallback.", e);
+    return getFallbackState();
   }
-  return aiGeneratedLogs;
 }
 
 // ──────────────────────────────────────────────
@@ -88,50 +143,63 @@ export const runSimulationTick = onSchedule("every 1 minutes", async () => {
   try {
     const batch = db.batch();
 
-    // 1. Core Metrics
-    const pulseMetrics = generatePulseMetrics(now);
-    const transitSchedules = generateTransitSchedules(now);
-    batch.set(db.doc('pulse_metrics/live'), pulseMetrics);
+    // 1. 🧠 Gen AI Directly Dictates the System State
+    const aiPayload = await fetchGenAIState();
+
+    // 2. Pulse Metrics (AI Driven)
+    batch.set(db.doc('pulse_metrics/live'), {
+      occupancy: aiPayload.state.occupancy,
+      flowRate: aiPayload.state.flowRate,
+      activeIncidents: aiPayload.state.activeIncidents,
+      timestamp: now.toISOString(),
+    });
+
+    // 3. Transit Schedules (AI Driven Status)
+    const transitSchedules = {
+      trains: [
+        { line: 'NJT Meadowlands Rail', status: 'On Time', time: '12m', color: 'bg-pitch' },
+        { line: 'Coach USA 351 Bus', status: aiPayload.state.transitDelayed ? 'Delayed' : 'On Time', time: aiPayload.state.transitDelayed ? '35m' : '15m', color: aiPayload.state.transitDelayed ? 'bg-signal' : 'bg-pitch' },
+        { line: 'NJT Secaucus Shuttle', status: 'On Time', time: '24m', color: 'bg-pitch' },
+      ],
+      timestamp: now.toISOString(),
+    };
     batch.set(db.doc('transit_schedules/live'), transitSchedules);
 
-    // 2. 🧠 Gen AI Real-Time Reasoning (Operational Intelligence)
-    const aiGeneratedLogs = await fetchGenAILogs(ai, pulseMetrics.occupancy, pulseMetrics.activeIncidents);
-
-    // 3. Format AI Timestamps
+    // 4. Format AI Timestamps
     const rotatedChats = [...fallbackPolyglotChats].map(chat => ({ ...chat, time: new Date(now.getTime() - Math.random() * 30000).toISOString() }));
-    const finalAccessLogs = (aiGeneratedLogs.accessLogs || []).map((log: any) => ({ ...log, time: new Date(now.getTime() - Math.random() * 10000).toISOString() }));
-    const finalWayfinderLogs = aiGeneratedLogs.wayfinderLogs || [];
-    const finalVerdeLogs = (aiGeneratedLogs.verdeTrails || []).map((log: any) => ({ ...log, time: new Date(now.getTime() - Math.random() * 20000).toISOString() }));
+    const finalAccessLogs = aiPayload.logs.accessLogs.map(log => ({ ...log, time: new Date(now.getTime() - Math.random() * 10000).toISOString() }));
+    const finalWayfinderLogs = aiPayload.logs.wayfinderLogs.map(log => ({ ...log, time: new Date(now.getTime() - Math.random() * 5000).toISOString() }));
+    const finalVerdeLogs = aiPayload.logs.verdeTrails.map(log => ({ ...log, time: new Date(now.getTime() - Math.random() * 20000).toISOString() }));
 
-    // 4. Update Agent Documents in Batch
+    // 5. Update Agent Documents in Batch (AI Driven)
     batch.set(db.doc('access_logs/live'), {
-      validScans: Math.floor(pulseMetrics.occupancy * 156 + Math.random() * 50),
-      invalidAttempts: pulseMetrics.activeIncidents * 7 + 2 + Math.floor(Math.random() * 3),
-      vipClearances: 345 + Math.floor(Math.random() * 5),
-      detectedBreaches: pulseMetrics.activeIncidents,
+      validScans: Math.floor(aiPayload.state.occupancy * 156),
+      invalidAttempts: aiPayload.state.activeIncidents * 7 + 2,
+      vipClearances: 345,
+      detectedBreaches: aiPayload.state.activeIncidents,
       reasoningTrail: finalAccessLogs,
       timestamp: now.toISOString(),
     });
 
     batch.set(db.doc('wayfinder_routes/live'), {
-      activeReroute: pulseMetrics.activeIncidents > 0,
-      targetGate: `GATE ${['C', 'D', 'F'][Math.floor(Math.random() * 3)]}`,
-      flowRate: pulseMetrics.flowRate * 12 + Math.floor(Math.random() * 50),
+      activeReroute: aiPayload.state.activeReroute,
+      targetGate: aiPayload.state.targetGate,
+      flowRate: aiPayload.state.flowRate * 12,
       capacityLimit: 850,
       reasoningTrail: finalWayfinderLogs,
       timestamp: now.toISOString(),
     });
 
     batch.set(db.doc('polyglot_streams/live'), {
-      activeNodes: pulseMetrics.flowRate + Math.floor(Math.random() * 20),
+      activeNodes: aiPayload.state.flowRate + 10,
       liveTranslations: rotatedChats,
       timestamp: now.toISOString(),
     });
 
     batch.set(db.doc('verde_stats/live'), {
-      powerDraw: (pulseMetrics.occupancy / 20) + (Math.random() * 0.2),
-      waterUsage: pulseMetrics.flowRate * 12 + Math.floor(Math.random() * 100),
-      carbonFootprint: `-${(12.4 + Math.random()).toFixed(1)}%`,
+      powerDraw: aiPayload.state.powerDraw,
+      waterUsage: aiPayload.state.waterUsage,
+      carbonFootprint: aiPayload.state.carbonFootprint,
       reasoningTrail: finalVerdeLogs,
       timestamp: now.toISOString(),
     });
@@ -141,7 +209,7 @@ export const runSimulationTick = onSchedule("every 1 minutes", async () => {
       status: 'healthy-cloud-function-genai',
     });
 
-    // 5. Commit atomic batch
+    // 6. Commit atomic batch
     await batch.commit();
     console.log(`✅ Simulation batch committed at ${now.toISOString()}`);
     
